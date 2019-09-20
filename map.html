@@ -1,0 +1,534 @@
+<html>
+<head>
+	
+	<title>Roadsituation map</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+
+	<script src="jquery-ui/external/jquery/jquery.js"></script>
+	<link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
+	<script src="jquery-ui/jquery-ui.min.js"></script>
+	
+</head>
+<body style="margin:0;">
+
+<div id="tabs" hidden="true">
+  <ul>
+    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 15px;' src="accident.png"></a></li>
+    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 15px;' src="message.png"></a></li>
+    <li title="Камера"><a href="#tabs-3"><img style='max-width: 15px;' src="cam.png"></a></li>
+	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 15px;' src="maintenance.png"></a></li>
+	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 15px;' src="block.png"></a></li>
+	<li title="Другое"><a href="#tabs-6"><img style='max-width: 15px;' src="other.png"></a></li>
+  </ul>
+  <div id="tabs-1" objectType='accident'>
+    	<div>
+		  <fieldset class="additions">
+			<legend>Выбор полос: </legend>
+			<label for="lanes-1-left"><img title="Левая полоса" style='max-width: 20px;' src="lanes_left.png"></label>
+			<input type="checkbox" name="addition" value=";leftlane" id="lanes-1-left">
+			<label for="lanes-1-center"><img title="Центральная полоса" style='max-width: 20px;' src="lanes_center.png"></label>
+			<input type="checkbox" name="addition" value=";centerlane" id="lanes-1-center">
+			<label for="lanes-1-right"><img title="Правая полоса" style='max-width: 20px;' src="lanes_right.png"></label>
+			<input type="checkbox" name="addition" value=";rightlane" id="lanes-1-right">
+		  </fieldset>
+		</div>
+		<div>
+			<label for="tabs-1-text">Ваше сообщение:</label>
+			<textarea cols="40" rows="4" class="usermessage" id="tabs-1-text" value="" data-clear-btn="true"></textarea>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a></div>
+		</div>
+  <div id="tabs-2" objectType='message'>
+    	<div>
+			<label for="tabs-2-text">Ваше сообщение:</label>
+			<textarea cols="40" rows="4" class="usermessage" id="tabs-2-text" value="" data-clear-btn="true"></textarea>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a>
+		</div>
+  </div>
+  <div id="tabs-3" objectType='cam'>
+    	<div>
+		  <fieldset class="additions">
+			<legend>Выбор направления: </legend>
+			<label for="direct-3-north"><img title="Север" style='max-width: 20px;' src="dirs_north.png"></label>
+			<input type="checkbox" name="addition" value=";north" id="direct-3-north">
+			<label for="direct-3-east"><img title="Восток" style='max-width: 20px;' src="dirs_east.png"></label>
+			<input type="checkbox" name="addition" value=";east" id="direct-3-east">
+			<label for="direct-3-south"><img title="Юг" style='max-width: 20px;' src="dirs_south.png"></label>
+			<input type="checkbox" name="addition" value=";south" id="direct-3-south">
+			<label for="direct-3-west"><img title="Запад" style='max-width: 20px;' src="dirs_west.png"></label>
+			<input type="checkbox" name="addition" value=";west" id="direct-3-west">
+		  </fieldset>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a>
+		</div>
+  </div>
+  <div id="tabs-4" objectType='maintenance'>
+    	<div>
+		  <fieldset class="additions">
+			<legend>Выбор полос: </legend>
+			<label for="lanes-2-left"><img title="Левая полоса" style='max-width: 20px;' src="lanes_left.png"></label>
+			<input type="checkbox" name="addition" value=";leftlane" id="lanes-2-left">
+			<label for="lanes-2-center"><img title="Центральная полоса" style='max-width: 20px;' src="lanes_center.png"></label>
+			<input type="checkbox" name="addition" value=";centerlane" id="lanes-2-center">
+			<label for="lanes-2-right"><img title="Правая полоса" style='max-width: 20px;' src="lanes_right.png"></label>
+			<input type="checkbox" name="addition" value=";rightlane" id="lanes-2-right">
+		  </fieldset>
+		</div>
+		<div>
+			<label for="tabs-4-text">Ваше сообщение:</label>
+			<textarea cols="40" rows="4" class="usermessage" id="tabs-4-text" value="" data-clear-btn="true"></textarea>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a>
+		</div>
+  </div>
+  <div id="tabs-5" objectType='block'>
+    	<div>
+		  <fieldset class="additions">
+			<legend>Выбор направления: </legend>
+			<label for="direct-5-forward"><img title="По направлению движения" style='max-width: 20px;' src="dirs_forward.png"></label>
+			<input type="checkbox" name="addition" value=";forward" id="direct-5-forward">
+			<label for="direct-5-backward"><img title="В обратном направлении движения" style='max-width: 20px;' src="dirs_backward.png"></label>
+			<input type="checkbox" name="addition" value=";backward" id="direct-5-backward">
+		  </fieldset>
+		</div>
+		<div>
+			<label for="tabs-5-text">Ваше сообщение:</label>
+			<textarea cols="40" rows="4" class="usermessage" id="tabs-5-text" value="" data-clear-btn="true"></textarea>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a>
+		</div>
+  </div>
+  <div id="tabs-6" objectType='other'>
+		<div>
+			<label for="tabs-6-text">Ваше сообщение:</label>
+			<textarea cols="40" rows="4" class="usermessage" id="tabs-6-text" value="" data-clear-btn="true"></textarea>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a>
+		</div>
+  </div>
+</div>
+
+<div id="mapid" style="width: 100%; height: 100%;"></div>
+<script>
+
+	var mymap = L.map('mapid').setView([59.023,30.123], 13);
+
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox.streets'
+	}).addTo(mymap);
+
+/*
+	L.marker([51.5, -0.09]).addTo(mymap)
+		.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+
+	L.circle([51.508, -0.11], 500, {
+		color: 'red',
+		fillColor: '#f03',
+		fillOpacity: 0.5
+	}).addTo(mymap).bindPopup("I am a circle.");
+
+	L.polygon([
+		[51.509, -0.08],
+		[51.503, -0.06],
+		[51.51, -0.047]
+	]).addTo(mymap).bindPopup("I am a polygon.");
+*/
+
+	rsDebug=false
+	popupContent = $('#tabs')[0].innerHTML
+	var popup = L.popup().setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
+	$('#tabs').remove()
+
+	function debug(obj) {
+		if (rsDebug) {
+			console.log(obj);
+		}
+	}
+
+	function userMessage(text) {
+		$("<div class='message success'>"+text+"</div>").appendTo('#consoleDiv')
+			.delay(2000).queue(function() { $(this).remove(); });
+		
+	}
+	
+	function userError(text) {
+		$("<div class='message error'>"+text+"</div>").appendTo('#consoleDiv')
+			.delay(2000).queue(function() { $(this).remove(); });
+	}
+
+	function parseAdditions(str) {
+		if (str == null) {
+			return ''
+		}
+		vals = str.split([';']);
+		valobj = new Object;
+		valobj['leftlane'] = 'в левой полосе';
+		valobj['centerlane'] = 'в центральной полосе';
+		valobj['rightlane'] = 'в правой полосе';
+		valobj['forward'] = 'по направлению';
+		valobj['backward'] = 'в обратном направлении';
+		valobj['north'] = 'на север';
+		valobj['south'] = 'на юг';
+		valobj['west'] = 'на запад';
+		valobj['east'] = 'на восток';
+		valobj['northwest'] = 'на север-запад';
+		valobj['northeast'] = 'на северо-восток';
+		valobj['southwest'] = 'на юго-запад';
+		valobj['southeast'] = 'на юго-восток';
+		
+		rstr='';
+		
+		if ( (vals.includes('centerlane')) && (vals.includes('rightlane')) && (vals.includes('leftlane')) ) {
+			rstr = rstr+'во всех полосах ';
+		} else if ( (vals.includes('centerlane')) || (vals.includes('rightlane')) || (vals.includes('leftlane')) ) {
+			rstr = rstr+'в ';
+			if (vals.includes('leftlane')) { rstr = rstr+'левой '; }
+			if (vals.includes('centerlane')) { rstr = rstr+'центральной '; }
+			if (vals.includes('rightlane')) { rstr = rstr+'правой '; }
+			rstr = rstr+'полосах ';
+		}
+		position = vals.indexOf('centerlane');
+		if ( ~position ) vals.splice(position, 1);
+		position = vals.indexOf('leftlane');
+		if ( ~position ) vals.splice(position, 1);
+		position = vals.indexOf('rightlane');
+		if ( ~position ) vals.splice(position, 1);
+		
+		if ( (vals.includes('backward')) && (vals.includes('forward')) ) {
+			rstr = rstr+'в обоих направлениях ';
+		} else if ( (vals.includes('backward')) || (vals.includes('forward')) ) {
+			if (vals.includes('backward')) { rstr = rstr+'по направлению движения '; }
+			if (vals.includes('forward')) { rstr = rstr+'по противоположному направлению движения '; }
+		}
+		position = vals.indexOf('backward');
+		if ( ~position ) vals.splice(position, 1);
+		position = vals.indexOf('forward');
+		if ( ~position ) vals.splice(position, 1);
+		
+		vals.forEach(function(item) {
+			if (typeof(valobj[item]) != 'undefined') {
+				rstr = rstr+valobj[item]+' ';
+			}
+		});
+		
+		return rstr;
+	}
+
+	typesObjLang = {
+		'accident': 'ДТП',
+		'cam': 'Камера',
+		'maintenance': 'Дорожные работы',
+		'block': 'Движение заблокировано',
+		'message': 'Сообщение',
+		'other': 'Иное',
+	}
+
+	function parseTypesObj(str) {
+		if (typeof(typesObjLang[str]) != 'undefined') {
+			return typesObjLang[str];
+		}
+		return '';
+	}
+
+	function ParseData(gdate) {
+		var ndate = new Date();
+		ndate.setTime(gdate*1000);
+        var hours = ndate.getHours().toString().padStart(2, '0');
+        var minutes = ndate.getMinutes().toString().padStart(2, '0');
+        var seconds = ndate.getSeconds().toString().padStart(2, '0');
+        var day = ndate.getDate().toString().padStart(2, '0');
+        var month = ndate.getMonth().toString().padStart(2, '0');
+        var year = ndate.getFullYear().toString().padStart(4, '0');
+        return day + "." + month + "." + year + " " + hours + ":" + minutes + ":" + seconds;
+    }
+
+	function send_point() {
+		ida=$( "#popup_tabs" ).children()[$( "#popup_tabs" ).tabs('option','active')+1].id
+		objType=$('#'+ida)[0].getAttribute('objectType')
+		messageEl=$('#'+ida+' .usermessage')[0]
+		if (messageEl) {
+			objMessage = messageEl.value
+		} else {
+			objMessage = null
+		};
+		objAddition=''
+		$('#'+ida+' [name=addition]:checked').each(function() { 
+			objAddition = objAddition+$( this )[0].value
+		})
+		
+		$.post( "http://127.0.0.1:8080/roadsituation/set.php", { add: '', lng: popup._latlng.lng, lat: popup._latlng.lat, type: objType, text: objMessage, addition: objAddition })
+		  .done(function( data ) {
+			userMessage( data );
+		  })
+		  .fail(function() {
+			userError( "Add object failed" );
+		  });
+	};
+
+	function onMapClick(e) {
+		popup.setLatLng(e.latlng)
+		popup.openOn(mymap);
+		$( "#popup_tabs" ).tabs();
+		$( "#popup_tabs :checkbox" ).checkboxradio({icon: false});
+		$( "#popup_tabs a.ui-button" ).click( function( event ) {
+		  send_point();
+		  $( "#popup_tabs" ).effect( 'clip', '', 500, function() { mymap.closePopup(); } );
+		} );
+		mymap.setView(e.latlng);
+	}
+
+	mymap.on('click', onMapClick);
+
+	var rsLoads = 0
+	var rsIcons = new Object();
+	var rsMarkers = new Object();
+	enableLoading = false
+
+	rsIcons['other'] = L.icon(
+		{
+			iconUrl: 'other.png',
+			iconSize:     [18, 18], // size of the icon
+//			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+//			shadowAnchor: [4, 62],  // the same for the shadow
+//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		}
+	);
+
+	rsIcons['message'] = L.icon(
+		{
+			iconUrl: 'message.png',
+			iconSize:     [18, 18], // size of the icon
+//			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+//			shadowAnchor: [4, 62],  // the same for the shadow
+//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		}
+	);
+
+	rsIcons['cam'] = L.icon(
+		{
+			iconUrl: 'cam.png',
+			iconSize:     [18, 18], // size of the icon
+//			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+//			shadowAnchor: [4, 62],  // the same for the shadow
+//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		}
+	);
+	
+	rsIcons['maintenance'] = L.icon(
+		{
+			iconUrl: 'maintenance.png',
+			iconSize:     [18, 18], // size of the icon
+//			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+//			shadowAnchor: [4, 62],  // the same for the shadow
+//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		}
+	);
+	
+	rsIcons['accident'] = L.icon(
+		{
+			iconUrl: 'accident.png',
+			iconSize:     [18, 18], // size of the icon
+//			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+//			shadowAnchor: [4, 62],  // the same for the shadow
+//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		}
+	);
+	
+	rsIcons['block'] = L.icon(
+		{
+			iconUrl: 'block.png',
+			iconSize:     [18, 18], // size of the icon
+//			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+//			shadowAnchor: [4, 62],  // the same for the shadow
+//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		}
+	);
+	
+	function is_url(str)
+	{
+	  regexp =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+			if (regexp.test(str))
+			{
+			  return true;
+			}
+			else
+			{
+			  return false;
+			}
+	}
+	
+	function loadQuadr(quadr) {
+		if (rsLoads>15) {
+			return false;
+		}
+		rsLoads++
+		if (rsMarkers[quadr] == 'needLoad') {
+			rsMarkers[quadr] = new Object
+		}
+
+		$.getJSON('http://127.0.0.1:8080/roadsituation/get.php?quadr='+quadr, function(data) {
+
+			quadr=data.quadr.id
+			debug('Loaded '+quadr)
+			//rsMarkers[quadr] = new Object
+			if (typeof(rsMarkers[quadr]) == 'undefined') {
+				rsMarkers[quadr] = new Object;
+			}
+			var rsNewMarkers = []
+			data.items.forEach(function(item) {
+				if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
+					link=item._source.source
+					if (is_url(link)) {
+						link="<a target=_blank href='"+link+"'>"+link+"</a>"
+					} else if (typeof(link) == 'undefined') {
+						link=''
+					}
+					addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
+					rsMarkers[quadr][item._index+item._id] = L.marker([item._source.lat, item._source.lng],{icon: rsIcons[item._source.type]}).addTo(mymap).bindPopup("<img style='max-width: 25px;' src='"+item._source.type+".png'><br />"+addition +"<br />Text: "+item._source.text+"<br />"+ParseData(item._source.time)+" <br />Source: "+link)
+				}
+				rsNewMarkers.push(''+item._index+item._id)
+			});
+			rsOldMarkers = Object.keys(rsMarkers[quadr])
+			rsOldMarkers.forEach(function(element) {
+				if (!rsNewMarkers.includes(element)) {
+					mymap.removeLayer(rsMarkers[quadr][element])
+					delete rsMarkers[quadr][parseInt(element)]
+				}
+			})
+		}).always(function() {
+			rsLoads = Math.max(0,rsLoads-1)
+		});
+	}
+	
+	function deleteQuadr(quadr) {
+		if (rsMarkers[quadr] == 'needLoad') {
+		
+		} else {
+			$.each(rsMarkers[quadr], function(id, item) {
+				mymap.removeLayer(item);
+			})
+		}
+		delete rsMarkers[quadr]
+		debug('Deleted  '+quadr)
+	}
+	
+	function loadMarkers(onlyNew=false) {
+		if (!enableLoading) {
+			debug("Loading is stoped")
+			return
+		}
+		debug('Start loading...')
+		if (onlyNew) {
+			loadingLayers = []
+			for (var prop in rsMarkers) {
+				if (rsMarkers[prop] == 'needLoad') {
+					loadingLayers.push(prop);
+				}
+			}
+		} else {
+			loadingLayers = Object.keys(rsMarkers)
+		}
+		loadingLayers.forEach(function(element) {
+			loadQuadr(element);
+		})
+	}
+	
+	function changeQuadrs(e) {
+		var bounds = mymap.getBounds();
+		bounds._northEast.lat;
+		bounds._northEast.lon;
+		bounds._southWest.lat;
+		bounds._southWest.lon;
+		
+		xmax=360
+		xmin=0
+		ymax=85
+		ymin=-85
+		xstep=2/10
+		ystep=2/10
+		
+		xc = xmax-xmin
+		xq = xc/xstep
+		qx1 = Math.floor(bounds._southWest.lng/xstep,-1)+1
+		qx2 = Math.floor(bounds._northEast.lng/xstep,-1)+1
+		qy1 = Math.floor((bounds._southWest.lat-ymin)/ystep,-1)+1
+		qy2 = Math.floor((bounds._northEast.lat-ymin)/ystep,-1)+1
+		
+		var rsNewLayers = [];
+		for (var qyn=qy1 ; qyn <= qy2; qyn++) {
+			for (var qxn=qx1; qxn <= qx2; qxn++) {
+				quadr=((qyn-1)*xq)+qxn
+				rsNewLayers.push(quadr)
+			}
+		}
+		
+		if (rsNewLayers.length>30) {
+			enableLoading=false;
+			userError("Try zooming out or downsizing the window");
+			return;
+		} else {
+			enableLoading=true;
+		}
+		
+		rsOldLayers = Object.keys(rsMarkers)
+		rsOldLayers.forEach(function(element) {
+			if (!rsNewLayers.includes(parseInt(element))) {
+				deleteQuadr(parseInt(element))
+			}
+		})
+		
+		rsNewLayers.forEach(function(element) {
+			if (!rsOldLayers.includes(''+element)) {
+				rsMarkers[element] = 'needLoad';
+			}
+		})
+		
+		debug(Object.keys(rsMarkers))
+		
+	}
+	
+	$('.leaflet-container').css('cursor','crosshair');
+	mymap.on('moveend', changeQuadrs);
+	changeQuadrs();
+	loadMarkers();
+	
+	setInterval(function(){ loadMarkers(true); }, 2000);
+	setInterval(function(){ loadMarkers(false); }, 30000);
+	
+	$( function() {
+
+	});
+
+</script>
+
+
+<div id=consoleDiv style="position: absolute; top:0; left:50%; order: 9999; z-index: 499;">
+
+</div>
+
+</body>
+</html>
