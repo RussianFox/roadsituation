@@ -5,8 +5,6 @@
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
-	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
@@ -20,22 +18,22 @@
 
 <div id="tabs" hidden="true">
   <ul>
-    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 15px;' src="accident.png"></a></li>
-    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 15px;' src="message.png"></a></li>
-    <li title="Камера"><a href="#tabs-3"><img style='max-width: 15px;' src="cam.png"></a></li>
-	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 15px;' src="maintenance.png"></a></li>
-	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 15px;' src="block.png"></a></li>
-	<li title="Другое"><a href="#tabs-6"><img style='max-width: 15px;' src="other.png"></a></li>
+    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 15px;' src="src/img/medium/accident.png"></a></li>
+    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 15px;' src="src/img/medium/message.png"></a></li>
+    <li title="Камера"><a href="#tabs-3"><img style='max-width: 15px;' src="src/img/medium/cam.png"></a></li>
+	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 15px;' src="src/img/medium/maintenance.png"></a></li>
+	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 15px;' src="src/img/medium/block.png"></a></li>
+	<li title="Другое"><a href="#tabs-6"><img style='max-width: 15px;' src="src/img/medium/other.png"></a></li>
   </ul>
   <div id="tabs-1" objectType='accident'>
     	<div>
 		  <fieldset class="additions">
 			<legend>Выбор полос: </legend>
-			<label for="lanes-1-left"><img title="Левая полоса" style='max-width: 20px;' src="lanes_left.png"></label>
+			<label for="lanes-1-left"><img title="Левая полоса" style='max-width: 20px;' src="src/img/medium/lanes_left.png"></label>
 			<input type="checkbox" name="addition" value=";leftlane" id="lanes-1-left">
-			<label for="lanes-1-center"><img title="Центральная полоса" style='max-width: 20px;' src="lanes_center.png"></label>
+			<label for="lanes-1-center"><img title="Центральная полоса" style='max-width: 20px;' src="src/img/medium/lanes_center.png"></label>
 			<input type="checkbox" name="addition" value=";centerlane" id="lanes-1-center">
-			<label for="lanes-1-right"><img title="Правая полоса" style='max-width: 20px;' src="lanes_right.png"></label>
+			<label for="lanes-1-right"><img title="Правая полоса" style='max-width: 20px;' src="src/img/medium/lanes_right.png"></label>
 			<input type="checkbox" name="addition" value=";rightlane" id="lanes-1-right">
 		  </fieldset>
 		</div>
@@ -59,13 +57,13 @@
     	<div>
 		  <fieldset class="additions">
 			<legend>Выбор направления: </legend>
-			<label for="direct-3-north"><img title="Север" style='max-width: 20px;' src="dirs_north.png"></label>
+			<label for="direct-3-north"><img title="Север" style='max-width: 20px;' src="src/img/medium/dirs_north.png"></label>
 			<input type="checkbox" name="addition" value=";north" id="direct-3-north">
-			<label for="direct-3-east"><img title="Восток" style='max-width: 20px;' src="dirs_east.png"></label>
+			<label for="direct-3-east"><img title="Восток" style='max-width: 20px;' src="src/img/medium/dirs_east.png"></label>
 			<input type="checkbox" name="addition" value=";east" id="direct-3-east">
-			<label for="direct-3-south"><img title="Юг" style='max-width: 20px;' src="dirs_south.png"></label>
+			<label for="direct-3-south"><img title="Юг" style='max-width: 20px;' src="src/img/medium/dirs_south.png"></label>
 			<input type="checkbox" name="addition" value=";south" id="direct-3-south">
-			<label for="direct-3-west"><img title="Запад" style='max-width: 20px;' src="dirs_west.png"></label>
+			<label for="direct-3-west"><img title="Запад" style='max-width: 20px;' src="src/img/medium/dirs_west.png"></label>
 			<input type="checkbox" name="addition" value=";west" id="direct-3-west">
 		  </fieldset>
 		</div>
@@ -77,11 +75,11 @@
     	<div>
 		  <fieldset class="additions">
 			<legend>Выбор полос: </legend>
-			<label for="lanes-2-left"><img title="Левая полоса" style='max-width: 20px;' src="lanes_left.png"></label>
+			<label for="lanes-2-left"><img title="Левая полоса" style='max-width: 20px;' src="src/img/medium/lanes_left.png"></label>
 			<input type="checkbox" name="addition" value=";leftlane" id="lanes-2-left">
-			<label for="lanes-2-center"><img title="Центральная полоса" style='max-width: 20px;' src="lanes_center.png"></label>
+			<label for="lanes-2-center"><img title="Центральная полоса" style='max-width: 20px;' src="src/img/medium/lanes_center.png"></label>
 			<input type="checkbox" name="addition" value=";centerlane" id="lanes-2-center">
-			<label for="lanes-2-right"><img title="Правая полоса" style='max-width: 20px;' src="lanes_right.png"></label>
+			<label for="lanes-2-right"><img title="Правая полоса" style='max-width: 20px;' src="src/img/medium/lanes_right.png"></label>
 			<input type="checkbox" name="addition" value=";rightlane" id="lanes-2-right">
 		  </fieldset>
 		</div>
@@ -97,9 +95,9 @@
     	<div>
 		  <fieldset class="additions">
 			<legend>Выбор направления: </legend>
-			<label for="direct-5-forward"><img title="По направлению движения" style='max-width: 20px;' src="dirs_forward.png"></label>
+			<label for="direct-5-forward"><img title="По направлению движения" style='max-width: 20px;' src="src/img/medium/dirs_forward.png"></label>
 			<input type="checkbox" name="addition" value=";forward" id="direct-5-forward">
-			<label for="direct-5-backward"><img title="В обратном направлении движения" style='max-width: 20px;' src="dirs_backward.png"></label>
+			<label for="direct-5-backward"><img title="В обратном направлении движения" style='max-width: 20px;' src="src/img/medium/dirs_backward.png"></label>
 			<input type="checkbox" name="addition" value=";backward" id="direct-5-backward">
 		  </fieldset>
 		</div>
@@ -134,23 +132,6 @@
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 		id: 'mapbox.streets'
 	}).addTo(mymap);
-
-/*
-	L.marker([51.5, -0.09]).addTo(mymap)
-		.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-
-	L.circle([51.508, -0.11], 500, {
-		color: 'red',
-		fillColor: '#f03',
-		fillOpacity: 0.5
-	}).addTo(mymap).bindPopup("I am a circle.");
-
-	L.polygon([
-		[51.509, -0.08],
-		[51.503, -0.06],
-		[51.51, -0.047]
-	]).addTo(mymap).bindPopup("I am a polygon.");
-*/
 
 	rsDebug=false
 	popupContent = $('#tabs')[0].innerHTML
@@ -304,7 +285,7 @@
 
 	rsIcons['other'] = L.icon(
 		{
-			iconUrl: 'other.png',
+			iconUrl: 'src/img/small/other.png',
 			iconSize:     [18, 18], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
 			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
@@ -315,7 +296,7 @@
 
 	rsIcons['message'] = L.icon(
 		{
-			iconUrl: 'message.png',
+			iconUrl: 'src/img/small/message.png',
 			iconSize:     [18, 18], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
 			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
@@ -326,7 +307,7 @@
 
 	rsIcons['cam'] = L.icon(
 		{
-			iconUrl: 'cam.png',
+			iconUrl: 'src/img/small/cam.png',
 			iconSize:     [18, 18], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
 			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
@@ -337,7 +318,7 @@
 	
 	rsIcons['maintenance'] = L.icon(
 		{
-			iconUrl: 'maintenance.png',
+			iconUrl: 'src/img/small/maintenance.png',
 			iconSize:     [18, 18], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
 			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
@@ -348,7 +329,7 @@
 	
 	rsIcons['accident'] = L.icon(
 		{
-			iconUrl: 'accident.png',
+			iconUrl: 'src/img/small/accident.png',
 			iconSize:     [18, 18], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
 			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
@@ -359,7 +340,7 @@
 	
 	rsIcons['block'] = L.icon(
 		{
-			iconUrl: 'block.png',
+			iconUrl: 'src/img/small/block.png',
 			iconSize:     [18, 18], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
 			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
