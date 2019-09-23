@@ -18,12 +18,12 @@
 
 <div id="tabs" hidden="true">
   <ul>
-    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 15px;' src="src/img/medium/accident.png"></a></li>
-    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 15px;' src="src/img/medium/message.png"></a></li>
-    <li title="Камера"><a href="#tabs-3"><img style='max-width: 15px;' src="src/img/medium/cam.png"></a></li>
-	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 15px;' src="src/img/medium/maintenance.png"></a></li>
-	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 15px;' src="src/img/medium/block.png"></a></li>
-	<li title="Другое"><a href="#tabs-6"><img style='max-width: 15px;' src="src/img/medium/other.png"></a></li>
+    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 18px;' src="src/img/medium/accident.png"></a></li>
+    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 18px;' src="src/img/medium/message.png"></a></li>
+    <li title="Камера"><a href="#tabs-3"><img style='max-width: 18px;' src="src/img/medium/cam.png"></a></li>
+	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 18px;' src="src/img/medium/maintenance.png"></a></li>
+	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 18px;' src="src/img/medium/block.png"></a></li>
+	<li title="Другое"><a href="#tabs-6"><img style='max-width: 18px;' src="src/img/medium/other.png"></a></li>
   </ul>
   <div id="tabs-1" objectType='accident'>
     	<div>
@@ -68,7 +68,7 @@
 		  </fieldset>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a>
+			<a class="ui-button send-button">Отправить</a>
 		</div>
   </div>
   <div id="tabs-4" objectType='maintenance'>
@@ -283,71 +283,38 @@
 	var rsMarkers = new Object();
 	enableLoading = false
 
-	rsIcons['other'] = L.icon(
-		{
-			iconUrl: 'src/img/small/other.png',
-			iconSize:     [18, 18], // size of the icon
-//			shadowSize:   [50, 64], // size of the shadow
-			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
-//			shadowAnchor: [4, 62],  // the same for the shadow
-//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+	var rsIcon = L.Icon.extend({
+		options: {
+			shadowUrl: 'src/img/medium/marker.png',
+			iconSize:     [14, 14],
+			shadowSize:   [20, 20],
+			iconAnchor:   [18, 18],
+			shadowAnchor: [20, 20],
+			popupAnchor:  [-14, -14]
 		}
-	);
+	});
 
+	L.icon = function (options) {
+		return new L.Icon(options);
+	};
+
+	rsIcons['other'] = new rsIcon({iconUrl: 'src/img/small/other.png'});
+	rsIcons['cam'] = new rsIcon({iconUrl: 'src/img/small/cam.png'});
+	rsIcons['maintenance'] = new rsIcon({iconUrl: 'src/img/small/maintenance.png'});
+	rsIcons['accident'] = new rsIcon({iconUrl: 'src/img/small/accident.png'});
+	rsIcons['block'] = new rsIcon({iconUrl: 'src/img/small/block.png'});
+	
 	rsIcons['message'] = L.icon(
 		{
 			iconUrl: 'src/img/small/message.png',
-			iconSize:     [18, 18], // size of the icon
+			iconSize:     [14, 14], // size of the icon
 //			shadowSize:   [50, 64], // size of the shadow
-			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
+			iconAnchor:   [10, 14], // point of the icon which will correspond to marker's location
 //			shadowAnchor: [4, 62],  // the same for the shadow
-//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+			popupAnchor:  [0, -7] // point from which the popup should open relative to the iconAnchor
 		}
 	);
 
-	rsIcons['cam'] = L.icon(
-		{
-			iconUrl: 'src/img/small/cam.png',
-			iconSize:     [18, 18], // size of the icon
-//			shadowSize:   [50, 64], // size of the shadow
-			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
-//			shadowAnchor: [4, 62],  // the same for the shadow
-//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-		}
-	);
-	
-	rsIcons['maintenance'] = L.icon(
-		{
-			iconUrl: 'src/img/small/maintenance.png',
-			iconSize:     [18, 18], // size of the icon
-//			shadowSize:   [50, 64], // size of the shadow
-			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
-//			shadowAnchor: [4, 62],  // the same for the shadow
-//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-		}
-	);
-	
-	rsIcons['accident'] = L.icon(
-		{
-			iconUrl: 'src/img/small/accident.png',
-			iconSize:     [18, 18], // size of the icon
-//			shadowSize:   [50, 64], // size of the shadow
-			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
-//			shadowAnchor: [4, 62],  // the same for the shadow
-//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-		}
-	);
-	
-	rsIcons['block'] = L.icon(
-		{
-			iconUrl: 'src/img/small/block.png',
-			iconSize:     [18, 18], // size of the icon
-//			shadowSize:   [50, 64], // size of the shadow
-			iconAnchor:   [9, 9], // point of the icon which will correspond to marker's location
-//			shadowAnchor: [4, 62],  // the same for the shadow
-//			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-		}
-	);
 	
 	function is_url(str)
 	{
@@ -360,6 +327,32 @@
 			{
 			  return false;
 			}
+	}
+	
+	function confirmObject(index, id, val) {
+	
+		$.post( "http://127.0.0.1:8080/roadsituation/set.php", { confirm: '', index: index, id: id, val: val})
+		  .done(function( data ) {
+			if (debug) {
+				console.log(data)
+			}
+			userMessage( "Add object success" );
+		  })
+		  .fail(function() {
+			if (debug) {
+				console.log(data)
+			}
+			userError( "Add object failed" );
+		  });
+	
+	
+		console.log(''+index+' '+id+' '+val);
+	}
+	
+	function objectPopup(e) {
+		
+		$(".disprove-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, -1); mymap.closePopup()});
+		$(".confirm-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
 	}
 	
 	function loadQuadr(quadr) {
@@ -389,7 +382,8 @@
 						link=''
 					}
 					addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
-					rsMarkers[quadr][item._index+item._id] = L.marker([item._source.lat, item._source.lng],{icon: rsIcons[item._source.type]}).addTo(mymap).bindPopup("<img style='max-width: 25px;' src='"+item._source.type+".png'><br />"+addition +"<br />Text: "+item._source.text+"<br />"+ParseData(item._source.time)+" <br />Source: "+link)
+					rsMarkers[quadr][item._index+item._id] = L.marker([item._source.lat, item._source.lng],{icon: rsIcons[item._source.type]}).addTo(mymap).bindPopup("<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div><a class='ui-button confirm-button'><span class=' ui-icon ui-icon-plusthick'></span>Подтвердить</a> <a class='ui-button disprove-button'><span class=' ui-icon ui-icon-minusthick'></span>Опровергнуть</a></div><div style='text-align:right'>"+link+"</div>").on('popupopen', objectPopup);
+					rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id}}
 				}
 				rsNewMarkers.push(''+item._index+item._id)
 			});
