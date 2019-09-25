@@ -1,2 +1,4 @@
-!web/jquery-ui/README.MD
-web/jquery-ui/
+/web/jquery-ui/*
+!/web/jquery-ui/README.md
+/server/htdocs/staff/composer*
+/server/htdocs/staff/vendor
