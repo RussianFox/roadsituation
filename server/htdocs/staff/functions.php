@@ -5,7 +5,7 @@ $eshosts = [
     'http://localhost:9200'
 ];
 
-$types = ['cam', 'accident', 'block', 'maintenance', 'message', 'other'];
+$types = ['cam', 'accident', 'block', 'maintenance', 'message', 'other', 'sos'];
 
 use Elasticsearch\ClientBuilder;
 require 'vendor/autoload.php';

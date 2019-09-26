@@ -18,12 +18,13 @@
 
 <div id="tabs" hidden="true">
   <ul>
-    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 18px;' src="src/img/medium/accident.png"></a></li>
-    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 18px;' src="src/img/medium/message.png"></a></li>
-    <li title="Камера"><a href="#tabs-3"><img style='max-width: 18px;' src="src/img/medium/cam.png"></a></li>
-	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 18px;' src="src/img/medium/maintenance.png"></a></li>
-	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 18px;' src="src/img/medium/block.png"></a></li>
-	<li title="Другое"><a href="#tabs-6"><img style='max-width: 18px;' src="src/img/medium/other.png"></a></li>
+    <li title="ДТП"><a href="#tabs-1"><img style='max-width: 16px;' src="src/img/medium/accident.png"></a></li>
+    <li title="Сообщение"><a href="#tabs-2"><img style='max-width: 16px;' src="src/img/medium/message.png"></a></li>
+    <li title="Камера"><a href="#tabs-3"><img style='max-width: 16px;' src="src/img/medium/cam.png"></a></li>
+	<li title="Дорожные работы"><a href="#tabs-4"><img style='max-width: 16px;' src="src/img/medium/maintenance.png"></a></li>
+	<li title="Проезд заблокирован"><a href="#tabs-5"><img style='max-width: 16px;' src="src/img/medium/block.png"></a></li>
+	<li title="SOS"><a href="#tabs-6"><img style='max-width: 16px;' src="src/img/medium/sos.png"></a></li>
+	<li title="Другое"><a href="#tabs-7"><img style='max-width: 16px;' src="src/img/medium/other.png"></a></li>
   </ul>
   <div id="tabs-1" objectType='accident'>
     	<div>
@@ -109,10 +110,19 @@
 			<a class="ui-button">Отправить</a>
 		</div>
   </div>
-  <div id="tabs-6" objectType='other'>
+  <div id="tabs-6" objectType='sos'>
 		<div>
 			<label for="tabs-6-text">Ваше сообщение:</label>
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-6-text" value="" data-clear-btn="true"></textarea>
+		</div>
+		<div>
+			<a class="ui-button">Отправить</a>
+		</div>
+  </div>
+  <div id="tabs-7" objectType='other'>
+		<div>
+			<label for="tabs-7-text">Ваше сообщение:</label>
+			<textarea cols="40" rows="4" class="usermessage" id="tabs-7-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
 			<a class="ui-button">Отправить</a>
@@ -137,6 +147,7 @@
 	rsLayers['block'] = L.layerGroup().addTo(mymap)
 	rsLayers['message'] = L.layerGroup().addTo(mymap)
 	rsLayers['accident'] = L.layerGroup().addTo(mymap)
+	rsLayers['sos'] = L.layerGroup().addTo(mymap)
 	
 	var overlayMaps = {
 		"ДТП": rsLayers['accident'],
@@ -144,6 +155,7 @@
 		"Камеры": rsLayers['cam'],
 		"Дорожные работы": rsLayers['maintenance'],
 		"Блокировки проезда": rsLayers['block'],
+		"Просьбы о помощи": rsLayers['sos'],
 		"Другое": rsLayers['other']
 	};
 
@@ -163,7 +175,7 @@
 
 	rsDebug=false
 	popupContent = $('#tabs')[0].innerHTML
-	var popup = L.popup().setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
+	var popup = L.popup({maxWidth: 340}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
 	$('#tabs').remove()
 
 	function debug(obj) {
@@ -247,6 +259,7 @@
 		'maintenance': 'Дорожные работы',
 		'block': 'Движение заблокировано',
 		'message': 'Сообщение',
+		'sos': 'Просьба о помощи',
 		'other': 'Иное',
 	}
 
@@ -331,6 +344,7 @@
 	rsIcons['maintenance'] = new rsIcon({iconUrl: 'src/img/small/maintenance.png'});
 	rsIcons['accident'] = new rsIcon({iconUrl: 'src/img/small/accident.png'});
 	rsIcons['block'] = new rsIcon({iconUrl: 'src/img/small/block.png'});
+	rsIcons['sos'] = new rsIcon({iconUrl: 'src/img/small/sos.png'});
 	
 	rsIcons['message'] = L.icon(
 		{
