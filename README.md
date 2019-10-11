@@ -3,7 +3,7 @@ Login on your server with centOS7 as **root**
 
 Create directory **/git** and clone repository
 ```
-yum install git
+yum install git -y
 mkdir /git
 cd /git
 git clone https://github.com/RussianFox/roadsituation.git
