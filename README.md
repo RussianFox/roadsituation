@@ -5,6 +5,7 @@ Create directory **/git** and clone repository
 ```
 yum install git
 mkdir /git
+cd /git
 git clone https://github.com/RussianFox/roadsituation.git
 ```
 
