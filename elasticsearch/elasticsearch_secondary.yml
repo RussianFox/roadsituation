@@ -1,0 +1,6 @@
+cluster.name: roadsituation
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+network.host: 0.0.0.0
+discovery.seed_hosts: ["lisss.ru-central1.internal"]
+cluster.initial_master_nodes: ["mainnode"]
