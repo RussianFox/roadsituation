@@ -296,7 +296,7 @@
 			objAddition = objAddition+$( this )[0].value
 		})
 		
-		$.post( "http://127.0.0.1:8080/roadsituation/set.php", { add: '', lng: popup._latlng.lng, lat: popup._latlng.lat, type: objType, text: objMessage, addition: objAddition })
+		$.post( "http://84.201.153.52:8080/set.php", { add: '', lng: popup._latlng.lng, lat: popup._latlng.lat, type: objType, text: objMessage, addition: objAddition })
 		  .done(function( data ) {
 			userMessage( data );
 		  })
@@ -373,7 +373,7 @@
 	
 	function confirmObject(index, id, val) {
 	
-		$.post( "http://127.0.0.1:8080/roadsituation/set.php", { confirm: '', index: index, id: id, val: val})
+		$.post( "http://84.201.153.52:8080/set.php", { confirm: '', index: index, id: id, val: val})
 		  .done(function( data ) {
 			if (debug) {
 				console.log(data)
@@ -406,7 +406,7 @@
 			rsMarkers[quadr] = new Object
 		}
 
-		$.getJSON('http://127.0.0.1:8080/roadsituation/get.php?quadr='+quadr, function(data) {
+		$.getJSON('http://84.201.153.52:8080/get.php?quadr='+quadr, function(data) {
 
 			quadr=data.quadr.id
 			debug('Loaded '+quadr)

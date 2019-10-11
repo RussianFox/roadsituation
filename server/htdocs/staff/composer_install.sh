@@ -1,2 +1,2 @@
 curl -s http://getcomposer.org/installer | php
-composer require elasticsearch/elasticsearch
+php composer.phar require elasticsearch/elasticsearch

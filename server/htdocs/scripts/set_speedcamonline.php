@@ -5,12 +5,12 @@ include "../staff/functions.php";
 $date = new DateTime("now", new DateTimeZone("UTC"));
 $index="speedcamonline_".($date->format('Y-m-d-H-i'));
 
-if ($handle = opendir('/srv/www/htdocs/roadsituation/scripts/speedcamonline')) {
+if ($handle = opendir('./speedcamonline')) {
     while (false !== ($file = readdir($handle))) {
 	
         if ($file != "." && $file != ".." && count(explode(".",$file))==1) {
     	    echo $file;
-	    $filec = file("/srv/www/htdocs/roadsituation/scripts/speedcamonline/".$file);
+	    $filec = file("./speedcamonline/".$file);
 	    foreach ($filec as $line) {
 	        $cam = explode(",", $line);
 	        if (count($cam)==6) {

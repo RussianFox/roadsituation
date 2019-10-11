@@ -1,0 +1,8 @@
+#! /bin/sh
+yum install epel-release yum-utils -y
+yum update -y
+yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm -y
+yum-config-manager --enable remi-php71
+yum update -y
+yum install java-1.8.0-openjdk-devel -y
+yum install unzip wget curl tcpdump mc screen htop iotop iftop php-cli php-fpm nginx elasticsearch elastic-curator git -y

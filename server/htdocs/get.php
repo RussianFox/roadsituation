@@ -1,8 +1,8 @@
 <?php
     require "staff/functions.php";
 
-    $quadr=$FALSE;
-    $coords=$FALSE;
+    $quadr=FALSE;
+    $coords=FALSE;
 
 
     if(isset($_GET["quadr"])) {
