@@ -7,11 +7,13 @@ yum install git -y
 mkdir /git
 cd /git
 git clone https://github.com/RussianFox/roadsituation.git
+
 ```
 
 Run install and setup
 ```
 cd /git/roadsituation/server
 sh ./install.sh
-sh ./setup.install
+sh ./setup.sh
+
 ```
