@@ -8,8 +8,8 @@ ln -s /git/roadsituation/server/php-fpm/roadsituation.conf /etc/php-fpm.d/roadsi
 cd /srv/www/htdocs/roadsituation/server/staff
 sh ./composer_install.sh
 systemctl enable elasticsearch
-systemctl start elasticsearch
+systemctl restart elasticsearch
 systemctl enable php-fpm
-systemctl start php-fpm
+systemctl restart php-fpm
 systemctl enable nginx
-systemctl start nginx
+systemctl restart nginx

@@ -1,5 +1,8 @@
 /web/jquery-ui/*
 !/web/jquery-ui/README.md
-/server/htdocs/staff/composer*
+/server/htdocs/scripts/*/*
+/server/htdocs/staff/*
 !/server/htdocs/staff/composer.json
+!/server/htdocs/staff/functions.php
+!/server/htdocs/staff/composer_install.sh
 /server/htdocs/staff/vendor
