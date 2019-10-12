@@ -13,8 +13,38 @@
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	
+<style>
+body {
+    margin: 0;
+}
+
+div.message {
+    background-color: rgba(11, 209, 244, .5);
+    padding: 5;
+    display: inline-block;
+    align: center;
+}
+
+div.message.error {
+    background-color: rgba(255, 51, 0, .5);
+}
+
+#consoleDiv {
+    position:absolute;
+    top:5;
+    margin-left: 20%;
+    width: 60%;
+    border: 0px solid #73AD21;
+    padding: 10px;
+    z-index:900;
+    text-align:center;
+}
+
+}
+</style>
+	
 </head>
-<body style="margin:0;">
+<body">
 
 <div id="tabs" hidden="true">
   <ul>
@@ -43,15 +73,19 @@
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-1-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a></div>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
+	</div>
+    
   <div id="tabs-2" objectType='message'>
     	<div>
 			<label for="tabs-2-text">Ваше сообщение:</label>
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-2-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
   </div>
   <div id="tabs-3" objectType='cam'>
@@ -69,7 +103,8 @@
 		  </fieldset>
 		</div>
 		<div>
-			<a class="ui-button send-button">Отправить</a>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
   </div>
   <div id="tabs-4" objectType='maintenance'>
@@ -89,7 +124,8 @@
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-4-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
   </div>
   <div id="tabs-5" objectType='block'>
@@ -107,7 +143,8 @@
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-5-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
   </div>
   <div id="tabs-6" objectType='sos'>
@@ -116,7 +153,8 @@
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-6-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
   </div>
   <div id="tabs-7" objectType='other'>
@@ -125,7 +163,8 @@
 			<textarea cols="40" rows="4" class="usermessage" id="tabs-7-text" value="" data-clear-btn="true"></textarea>
 		</div>
 		<div>
-			<a class="ui-button">Отправить</a>
+			<a class="ui-button send">Отправить</a>
+			<a class="ui-button close-popup">Закрыть</a>
 		</div>
   </div>
 </div>
@@ -167,15 +206,20 @@
 		id: 'mapbox.streets'
 	}).addTo(mymap);
 
+	var osmMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	    attribution: 'Map data <a target="_blank" href="http://www.openstreetmap.org">OpenStreetMap.org</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+	})
+
 	var baseMaps = {
-		"Mapbox": baseMap
+		"Mapbox": baseMap,
+		"Openstreetmap": osmMap
 	};
 
 	L.control.layers(baseMaps, overlayMaps).addTo(mymap);
 
 	rsDebug=false
 	popupContent = $('#tabs')[0].innerHTML
-	var popup = L.popup({maxWidth: 340}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
+	var popup = L.popup({ maxWidth: 325, closeOnClick: false, autoClose: false, closeButton: false}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
 	$('#tabs').remove()
 
 	function debug(obj) {
@@ -185,13 +229,13 @@
 	}
 
 	function userMessage(text) {
-		$("<div class='message success'>"+text+"</div>").appendTo('#consoleDiv')
+		$("<div class='message success'>"+text+"</div><br>").appendTo('#consoleDiv')
 			.delay(2000).queue(function() { $(this).remove(); });
 		
 	}
 	
 	function userError(text) {
-		$("<div class='message error'>"+text+"</div>").appendTo('#consoleDiv')
+		$("<div class='message error'>"+text+"</div><br>").appendTo('#consoleDiv')
 			.delay(2000).queue(function() { $(this).remove(); });
 	}
 
@@ -306,15 +350,22 @@
 	};
 
 	function onMapClick(e) {
+	    if (mymap._popup == null) {
 		popup.setLatLng(e.latlng)
 		popup.openOn(mymap);
 		$( "#popup_tabs" ).tabs();
 		$( "#popup_tabs :checkbox" ).checkboxradio({icon: false});
-		$( "#popup_tabs a.ui-button" ).click( function( event ) {
+		$( "#popup_tabs a.ui-button.send" ).click( function( event ) {
 		  send_point();
 		  $( "#popup_tabs" ).effect( 'clip', '', 500, function() { mymap.closePopup(); } );
 		} );
+		$( "#popup_tabs a.ui-button.close-popup" ).click( function( event ) {
+		  mymap.closePopup();
+		} );
 		mymap.setView(e.latlng);
+	    } else {
+		mymap.closePopup();
+	    }
 	}
 
 	mymap.on('click', onMapClick);
@@ -544,9 +595,7 @@
 </script>
 
 
-<div id=consoleDiv style="position: absolute; top:0; left:50%; order: 9999; z-index: 499;">
-
-</div>
+<div id=consoleDiv></div>
 
 </body>
 </html>
