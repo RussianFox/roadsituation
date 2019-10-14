@@ -15,8 +15,8 @@ $ymin=-85;
 $ymax=85;
 $xmin=0;
 $xmax=360;
-$xstep=0.2;
-$ystep=0.2;
+$xstep=0.1;
+$ystep=0.1;
 
 function cors_header() {
     header('Access-Control-Allow-Origin: *');

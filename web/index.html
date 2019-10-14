@@ -526,6 +526,13 @@ div.message.error {
 		})
 	}
 	
+	function clearMap() {
+		rsOldLayers = Object.keys(rsMarkers)
+		rsOldLayers.forEach(function(element) {
+			deleteQuadr(parseInt(element))
+		})
+	}
+	
 	function changeQuadrs(e) {
 		var bounds = mymap.getBounds();
 		bounds._northEast.lat;
@@ -537,8 +544,8 @@ div.message.error {
 		xmin=0
 		ymax=85
 		ymin=-85
-		xstep=2/10
-		ystep=2/10
+		xstep=1/10
+		ystep=1/10
 		
 		xc = xmax-xmin
 		xq = xc/xstep
@@ -557,6 +564,7 @@ div.message.error {
 		
 		if (rsNewLayers.length>30) {
 			enableLoading=false;
+			clearMap();
 			userError("Try zooming out or downsizing the window");
 			return;
 		} else {
