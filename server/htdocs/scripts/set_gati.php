@@ -11,7 +11,7 @@ function numberFormat($digit, $width) {
 $pages=['a','s','o'];
 
 $date = new DateTime("now", new DateTimeZone("UTC"));
-$index="gati_".($date->format('Y-m-d-H-i'));
+$index="gati";
 
 foreach ($pages as $ii) {
 
@@ -23,6 +23,7 @@ foreach ($pages as $ii) {
         preg_match_all('/GeoObject gml:id="(.*)".*gml:name>(.*)<.*style>(.*)<.*gml:srk>(.*)<.*adr>(.*)<.*adr2>(.*)<.*gml:pos>(.*) (.*)</sUsi',$file, $matches);
 
 	for ($i=0; $i<count($matches[1]); $i++) {
+	    $id = $matches[1][$i];
 	    $style=ltrim($matches[3][$i], '#');
 	    $type="maintenance";
 	    if (in_array($style, array('ogr4','ogr1','zakr1','zakr4'))) {
@@ -35,7 +36,7 @@ foreach ($pages as $ii) {
     	    $name=trim(str_replace('&quot;', '"', $matches[2][$i]." ".$matches[5][$i]." ".$matches[6][$i]." ".$matches[4][$i]));
 	    $lat=1*trim($matches[8][$i]);
     	    $lng=1*trim($matches[7][$i]);
-	    add_object_int($lng,$lat,$type,$name,null,$link,$index);
+	    update_object_int($id,$lng,$lat,$type,$name,null,$link,$index);
 	}
     }
 }

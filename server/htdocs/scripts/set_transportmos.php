@@ -12,7 +12,7 @@ $pages=['a','s','o'];
 
 $date = new DateTime("now", new DateTimeZone("UTC"));
 
-$index="transportmos_".($date->format('Y-m-d-H-i'));
+$index="transportmos";
 
     $datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
 
@@ -46,10 +46,14 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 	//file_put_contents('transportmos.json', $file);
 	$file = json_decode($file, true);
 	foreach ($file['json']['features'] as $feature) {
+	
 	    $object_id=$feature['options']['object_id'];
 	    if (strpos($object_id,'_')) {
 		continue;
 	    };
+	    
+	    var_dump($object_id);
+	    
 	    $type="block";
 	    $name=$feature['properties']['hintContent'];
 	    $link="https://transport.mos.ru/";
@@ -58,7 +62,7 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 		array_push($coordinates,array('lat'=>$coordinate[0],"lng"=>$coordinate[1]));
 	    };
 	    $center = center_line($coordinates);
-	    add_object_int($center['lng'],$center['lat'],$type,$name,null,$link,$index);
+	    update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index);
 	    
 	}
 	replace_index_alias($index,"roadsituation_transportmos");

@@ -126,7 +126,6 @@ function vote_object($index,$id,$vote) {
     add_error("Wrong vote");
 }
 
-
 function add_object($lng, $lat, $type="other", $text="", $addition="", $source="user", $indexname=False) {
     global $client,$types;
 
@@ -142,8 +141,10 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
         'body' => [
     	    'time' => time(),
     	    'type' => $type,
-	    'lat' => 1*$lat,
-	    'lng' => 1*$lng,
+	    'location' => [
+		'lat' => $lat,
+		'lon' => $lng
+	    ],
 	    'addition' => $addition,
 	    'source' => $source,
 	    'text' => $text,
@@ -152,6 +153,7 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
     	]
     ];
 
+    
     $result = $client->index($params);
     //print_r($result);
 }
@@ -206,7 +208,13 @@ function replace_index_alias($index, $alias) {
         	)
     	    )
 	);
-	$client->indices()->updateAliases($params);
+
+	try {
+	    $result = $client->indices()->updateAliases($params);
+	} catch (Exception $e)  {
+	    return false;
+	}
+
     } 
     $params['body'] = array(
         'actions' => array(
@@ -218,7 +226,14 @@ function replace_index_alias($index, $alias) {
             )
         )
     );
-    $client->indices()->updateAliases($params);
+
+    try {
+	$result = $client->indices()->updateAliases($params);
+	return true;
+    } catch (Exception $e)  {
+	return false;
+    }
+    
 }
 
 function add_object_int($lng, $lat, $type="other", $text="", $addition="", $source, $indexname) {
@@ -236,8 +251,10 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
         'body' => [
     	    'time' => time(),
     	    'type' => $type,
-	    'lat' => 1*$lat,
-	    'lng' => 1*$lng,
+	    'location' => [
+		'lat' => $lat,
+		'lon' => $lng
+	    ],
 	    'addition' => $addition,
 	    'source' => $source,
 	    'text' => $text,
@@ -246,8 +263,61 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
     	]
     ];
 
-    $result = $client->index($params);
-    //print_r($result);
+    try {
+        $result = $client->index($params);
+	//print_r($result);
+	return true;
+    } catch (Exception $e)  {
+	return false;
+    }
+}
+
+
+function update_object_int($id,$lng, $lat, $type="other", $text="", $addition="", $source, $indexname) {
+    global $client,$types;
+
+    $date = new DateTime("now", new DateTimeZone("UTC"));
+    $index=$indexname;
+
+    if (!in_array($type,$types)) {
+	add_error("Wrong type");
+    };
+
+    $params = [
+    	'index' => $index,
+    	'id'    => $id,
+    	'body'  => [
+    		'doc' => [
+			'location' => [
+			    'lat' => 1*$lat,
+			    'lon' => 1*$lng
+			],
+			'addition' => $addition,
+			'text' => $text
+    		],
+    		'upsert' => [
+		    'time' => time(),
+    		    'type' => $type,
+		    'location' => [
+			'lat' => 1*$lat,
+			'lon' => 1*$lng
+		    ],
+		    'addition' => $addition,
+		    'source' => $source,
+		    'text' => $text,
+		    'confirm' => 0,
+		    'discard' => 0
+    		]
+        ]
+    ];
+
+    try {
+        $result = $client->update($params);
+	//print_r($result);
+	return true;
+    } catch (Exception $e)  {
+	return false;
+    }
 }
 
 
@@ -267,14 +337,14 @@ function get_quadr($quadr) {
         $params['body']['query']['bool']['filter'] = [
 	    ['range' =>
 		[
-		    'lat'=>[
+		    'location.lat'=>[
 			'gte'=>$coords['y1'],
 			'lte'=>$coords['y2']
 		    ]
 		]
 	    ],
 	    ['range' =>[
-		'lng'=>[
+		'location.log'=>[
 		    'gte'=>$coords['x1'],
 		    'lte'=>$coords['x2']
 		]
