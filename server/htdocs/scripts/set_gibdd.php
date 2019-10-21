@@ -16,6 +16,7 @@ if (!$bool) {
     $response = $client->indices()->create($params);
 }
 
+$ids=array();
 for ($ii=1;$ii<100;$ii++) {
     $reg=$ii;
     $url = "https://xn--90adear.xn--p1ai/r/".numberFormat($ii, 2)."/milestones/";
@@ -40,10 +41,13 @@ for ($ii=1;$ii<100;$ii++) {
 	    if (!update_object_int($id,$lng,$lat,"cam",$name,null,$link,$index)) {
 		echo "Failed: $lat|$lng $name ($link)\n";
 	    };
+	    $ids[]=$id;
 	}
     }
     echo "Region $ii: $i\n";
 }
+
+clean_objects($index,'must_not',$ids);
 
 replace_index_alias($index,"roadsituation_gibdd")
 

@@ -12,6 +12,7 @@ $pages=['a','s','o'];
 
 $date = new DateTime("now", new DateTimeZone("UTC"));
 $index="gati";
+$ids=array();
 
 foreach ($pages as $ii) {
 
@@ -37,10 +38,11 @@ foreach ($pages as $ii) {
 	    $lat=1*trim($matches[8][$i]);
     	    $lng=1*trim($matches[7][$i]);
 	    update_object_int($id,$lng,$lat,$type,$name,null,$link,$index);
+	    $ids[]=$id;
 	}
     }
 }
-
+clean_objects($index,'must_not',$ids);
 replace_index_alias($index,"roadsituation_gati");
 
 ?>

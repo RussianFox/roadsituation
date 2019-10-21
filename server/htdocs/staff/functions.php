@@ -236,6 +236,31 @@ function replace_index_alias($index, $alias) {
     
 }
 
+function clean_objects($index, $type, $range) {
+    global $client,$types;
+
+    if (!in_array($type,array('must','must_not'))) {
+	add_error("Wrong type");
+    };
+
+    $params['index'] = $index;
+    $params['body']['query']['bool'][$type] =
+	[
+	    'terms'=>[
+		'_id'=>$range
+	    ]
+	];
+
+    try {
+        $result = $client->deleteByQuery($params);
+	//print_r($result);
+	return true;
+    } catch (Exception $e)  {
+	//echo $e->getMessage();
+	return false;
+    }
+}
+
 function add_object_int($lng, $lat, $type="other", $text="", $addition="", $source, $indexname) {
     global $client,$types;
 
@@ -273,7 +298,7 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 }
 
 
-function update_object_int($id,$lng, $lat, $type="other", $text="", $addition="", $source, $indexname) {
+function update_object_int($id,$lng, $lat, $type="other", $text="", $addition="", $source, $indexname,$geometry=null) {
     global $client,$types;
 
     $date = new DateTime("now", new DateTimeZone("UTC"));
@@ -302,6 +327,7 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
 			'lat' => 1*$lat,
 			'lon' => 1*$lng
 		    ],
+		    'geometry' => $geometry,
 		    'addition' => $addition,
 		    'source' => $source,
 		    'text' => $text,
@@ -334,22 +360,18 @@ function get_quadr($quadr) {
         $params['index'] = 'roadsituation*';
 	$params['size'] = 100;
 	$params['from'] = $iloaded;
-        $params['body']['query']['bool']['filter'] = [
-	    ['range' =>
+        $params['body']['query']['geo_bounding_box']['location'] =
 		[
-		    'location.lat'=>[
-			'gte'=>$coords['y1'],
-			'lte'=>$coords['y2']
+		    'top_left'=>[
+			'lat'=>$coords['y2'],
+			'lon'=>$coords['x1']
+		    ],
+		    'bottom_right'=>[
+			'lat'=>$coords['y1'],
+			'lon'=>$coords['x2']
 		    ]
-		]
-	    ],
-	    ['range' =>[
-		'location.log'=>[
-		    'gte'=>$coords['x1'],
-		    'lte'=>$coords['x2']
-		]
-	    ]]
-	];
+		];
+	//error_log(print_r($params,true));
 	$result = $client->search($params);
 	$items = array_merge($items,$result['hits']['hits']);
 	$iloaded=count($items);
@@ -359,12 +381,13 @@ function get_quadr($quadr) {
     $quadrdata=[];
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
-    $quadrdata['shards']=$result['_shards'];
-    $quadrdata['hits']['total']=$result['hits']['total'];
-    $quadrdata['hits']['maxscore']=$result['hits']['maxscore'];
+//    $quadrdata['shards']=$result['_shards'];
+    $quadrdata['hits']['total']=$result['hits']['total']['value'];
+//    $quadrdata['hits']['maxscore']=$result['hits']['maxscore'];
 //  $quadrdata['items']=$result['hits']['hits'];
     $quadrdata['items']=$items;
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
+//    $quadrdata['quadr']['location']=$params['body']['query']['geo_bounding_box']['location'];
     return $quadrdata;
 }
 

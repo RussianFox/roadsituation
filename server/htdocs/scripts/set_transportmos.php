@@ -14,6 +14,8 @@ $date = new DateTime("now", new DateTimeZone("UTC"));
 
 $index="transportmos";
 
+$ids = array();
+
     $datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
 
     $context = stream_context_create(array(
@@ -45,26 +47,46 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 	echo "URL loaded\n";
 	//file_put_contents('transportmos.json', $file);
 	$file = json_decode($file, true);
+	$html=$file['html'];
+	//$list = preg_match_all('/(<li id="closure_id_.*<\/li>)/sUsi',$html,$matches);
+	$list = preg_match_all('/<li id="closure_id_.*<span class="sp1">(.*)<\/span>.*<span class="sp2">(.*)<\/span>.*class="moreInfo_block">(.*)<\/div>.*<\/li>/sUsi',$html,$matches);
+	
+//	var_dump($matches[2]);
 	foreach ($file['json']['features'] as $feature) {
 	
 	    $object_id=$feature['options']['object_id'];
 	    if (strpos($object_id,'_')) {
 		continue;
 	    };
-	    
-	    var_dump($object_id);
-	    
 	    $type="block";
+	    $name=$feature['properties']['hintContent']." Type:".$feature['options']['type']." Color: ".$feature['options']['iconColor'].", ".$feature['options']['strokeColor'][0].", ".$feature['options']['strokeColor'][1];
 	    $name=$feature['properties']['hintContent'];
+	    
+	    $kk = array_search($name,$matches[2]);
+	    if ($kk) {
+		$name = strip_tags(trim($matches[2][$kk])."\r\n ".trim($matches[1][$kk])."\r\n ".trim($matches[3][$kk]));
+		$name = preg_replace('/\s+/', ' ', $name);
+	    }
+	    
 	    $link="https://transport.mos.ru/";
 	    $coordinates=array();
+	    $geometry="";
 	    foreach ($feature['geometry']['coordinates'] as $coordinate) {
 		array_push($coordinates,array('lat'=>$coordinate[0],"lng"=>$coordinate[1]));
+		$geometry = $geometry.($geometry=="" ? "" : ", ").$coordinate[0]." ".$coordinate[1];
 	    };
+	    $geometry=$feature['geometry']['type']." (".$geometry.")";
 	    $center = center_line($coordinates);
-	    update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index);
-	    
+	    if ($feature['options']['strokeColor'][1]=="#000000") {
+		$type="block";
+	    } else {
+		$type="maintenance";
+	    }
+	    update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
+	    $ids[] = $object_id;
 	}
+	
+	clean_objects($index,'must_not',$ids);
 	replace_index_alias($index,"roadsituation_transportmos");
     }
 
