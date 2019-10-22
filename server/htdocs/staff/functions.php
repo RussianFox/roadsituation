@@ -1,26 +1,15 @@
 <?php
 
-$eshosts = [
-//    'https://vpc-etna-trader-logs-styi6pcdbpupmgcrw65ebragea.us-east-1.es.amazonaws.com:443'
-    'http://localhost:9200'
-];
+include 'config/main.php';
+include 'config/env.php';
+include 'config/elasticsearch.php';
+
 
 $types = ['cam', 'accident', 'block', 'maintenance', 'message', 'other', 'sos'];
 
 use Elasticsearch\ClientBuilder;
 require 'vendor/autoload.php';
 $client = ClientBuilder::create()->setHosts($eshosts)->build();
-
-$ymin=-85;
-$ymax=85;
-$xmin=0;
-$xmax=360;
-$xstep=0.1;
-$ystep=0.1;
-
-function cors_header() {
-    header('Access-Control-Allow-Origin: *');
-}
 
 function correct_coords($x,$min,$max) {
     $xn = ((($x-$min)%($max-$min))+$max-$min)%($max-$min)+$min;
@@ -31,7 +20,7 @@ function convert_coords($x1,$y1,$x2,$y2) {
 
     $x1=correct_coords($x1,$GLOBALS['xmin'],$GLOBALS['xmax']);
     $x2=correct_coords($x2,$GLOBALS['xmin'],$GLOBALS['xmax']);
-    
+
     $y1=correct_coords($y1,$GLOBALS['ymin'],$GLOBALS['ymax']);
     $y2=correct_coords($y2,$GLOBALS['ymin'],$GLOBALS['ymax']);
 
@@ -41,9 +30,9 @@ function convert_coords($x1,$y1,$x2,$y2) {
     $qx2 = floor(max($x1,$x2)/$GLOBALS['xstep'])+1;
     $qy1 = floor((min($y1,$y2)-$GLOBALS['ymin'])/$GLOBALS['ystep'])+1;
     $qy2 = floor((max($y1,$y2)-$GLOBALS['ymin'])/$GLOBALS['ystep'])+1;
-    
+
     $arr=[];
-    
+
     for ($qyn=$qy1; $qyn<=$qy2; $qyn++) {
 	for ($qxn=$qx1; $qxn<=$qx2; $qxn++) {
 	    $arr[]=((($qyn-1)*$xq))+$qxn;
@@ -75,7 +64,7 @@ function add_success($text) {
 }
 
 function vote_object($index,$id,$vote) {
-    global $client,$types;
+    global $client;
 
     $val = 1*$vote;
     if ($val==1) {
@@ -126,18 +115,30 @@ function vote_object($index,$id,$vote) {
     add_error("Wrong vote");
 }
 
+function check_object_type($type) {
+    global $object_perm_types,$object_temp_types;
+    if (!in_array($type,$object_perm_types)) {
+	return 'permament';
+    };
+    if (!in_array($type,$object_temp_types)) {
+	return 'temporary';
+    };
+    return false;
+}
+
 function add_object($lng, $lat, $type="other", $text="", $addition="", $source="user", $indexname=False) {
-    global $client,$types;
+    global $client;
 
     $date = new DateTime("now", new DateTimeZone("UTC"));
     $index="roadsituation".($indexname?"_".$indexname:"")."_".($date->format('Y-m-d-H'));
 
-    if (!in_array($type,$types)) {
+    $index_type = check_object_type($type);
+    if (!$index_type) {
 	add_error("Wrong type");
     };
 
     $params = [
-	'index' => $index,
+	'index' => $index."_".$index_type,
         'body' => [
     	    'time' => time(),
     	    'type' => $type,
@@ -155,7 +156,6 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
 
     
     $result = $client->index($params);
-    //print_r($result);
 }
 
 function center_line($coordinates) {
@@ -193,7 +193,7 @@ function center_line($coordinates) {
 };
 
 function replace_index_alias($index, $alias) {
-    global $client,$types;
+    global $client;
     
     $indexParams['index'] = $alias;
     if ($client->indices()->exists($indexParams)) {
@@ -237,9 +237,10 @@ function replace_index_alias($index, $alias) {
 }
 
 function clean_objects($index, $type, $range) {
-    global $client,$types;
+    global $client;
 
-    if (!in_array($type,array('must','must_not'))) {
+    $index_type = check_object_type($type);
+    if (!$index_type) {
 	add_error("Wrong type");
     };
 
@@ -253,21 +254,20 @@ function clean_objects($index, $type, $range) {
 
     try {
         $result = $client->deleteByQuery($params);
-	//print_r($result);
 	return true;
     } catch (Exception $e)  {
-	//echo $e->getMessage();
 	return false;
     }
 }
 
 function add_object_int($lng, $lat, $type="other", $text="", $addition="", $source, $indexname) {
-    global $client,$types;
+    global $client;
 
     $date = new DateTime("now", new DateTimeZone("UTC"));
     $index=$indexname;
 
-    if (!in_array($type,$types)) {
+    $index_type = check_object_type($type);
+    if (!$index_type) {
 	add_error("Wrong type");
     };
 
@@ -290,7 +290,6 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 
     try {
         $result = $client->index($params);
-	//print_r($result);
 	return true;
     } catch (Exception $e)  {
 	return false;
@@ -299,12 +298,13 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 
 
 function update_object_int($id,$lng, $lat, $type="other", $text="", $addition="", $source, $indexname,$geometry=null) {
-    global $client,$types;
+    global $client;
 
     $date = new DateTime("now", new DateTimeZone("UTC"));
     $index=$indexname;
 
-    if (!in_array($type,$types)) {
+    $index_type = check_object_type($type);
+    if (!$index_type) {
 	add_error("Wrong type");
     };
 
@@ -339,7 +339,6 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
 
     try {
         $result = $client->update($params);
-	//print_r($result);
 	return true;
     } catch (Exception $e)  {
 	return false;
@@ -371,7 +370,6 @@ function get_quadr($quadr) {
 			'lon'=>$coords['x2']
 		    ]
 		];
-	//error_log(print_r($params,true));
 	$result = $client->search($params);
 	$items = array_merge($items,$result['hits']['hits']);
 	$iloaded=count($items);
@@ -381,13 +379,9 @@ function get_quadr($quadr) {
     $quadrdata=[];
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
-//    $quadrdata['shards']=$result['_shards'];
     $quadrdata['hits']['total']=$result['hits']['total']['value'];
-//    $quadrdata['hits']['maxscore']=$result['hits']['maxscore'];
-//  $quadrdata['items']=$result['hits']['hits'];
     $quadrdata['items']=$items;
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
-//    $quadrdata['quadr']['location']=$params['body']['query']['geo_bounding_box']['location'];
     return $quadrdata;
 }
 
