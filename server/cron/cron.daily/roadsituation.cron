@@ -1,0 +1,6 @@
+#! /bin/sh
+cd /srv/www/htdocs/roadsituation/server/scripts/
+php /srv/www/htdocs/roadsituation/server/scripts/set_gati.php >> /var/log/roadsituation/gati.log
+php /srv/www/htdocs/roadsituation/server/scripts/set_gibdd.php >> /var/log/roadsituation/gibdd.log
+php /srv/www/htdocs/roadsituation/server/scripts/set_speedcamonline.php >> /var/log/roadsituation/speedcamonline.log
+php /srv/www/htdocs/roadsituation/server/scripts/set_transportmos.php >> /var/log/roadsituation/transportmos.log

@@ -1,5 +1,7 @@
 #! /bin/sh
 mkdir -p /srv/www/htdocs/roadsituation
+mkdir -p /var/log/curator/
+mkdir -p /var/log/roadsituation/
 ln -s /git/roadsituation/web /srv/www/htdocs/roadsituation/map
 ln -s /git/roadsituation/server/htdocs /srv/www/htdocs/roadsituation/server
 ln -s /git/roadsituation/server/nginx/conf.d/vhosts.conf  /etc/nginx/conf.d/vhosts.conf

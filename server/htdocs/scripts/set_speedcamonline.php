@@ -2,7 +2,8 @@
 
 include "../staff/functions.php";
 
-$date = new DateTime("now", new DateTimeZone("UTC"));
+echo "Start ".date('Y-m-d H:i:s')."\r\n";
+
 $index="speedcamonline";
 
 // Create a stream
@@ -17,19 +18,19 @@ $opts = [
 $context = stream_context_create($opts);
 
 $files=array();
-//$files[] = "wget https://speedcamonline.ru/primo/Rus/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/Ukraine/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/Latvija/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/GE/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/uz/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/tm/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/kz/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/by/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/Fin/nomobile/";
-$files[] = "wget https://speedcamonline.ru/primo/EU/nomobile/";
+//$files[] = "https://speedcamonline.ru/primo/Rus/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/Ukraine/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/Latvija/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/GE/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/uz/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/tm/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/kz/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/by/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/Fin/nomobile/";
+$files[] = "https://speedcamonline.ru/primo/EU/nomobile/";
 
 foreach ($files as $file) {
-    echo $file;
+    echo $file."\r\n";
     $filec = file('https://speedcamonline.ru/primo/Ukraine/nomobile/',false,$context);
     foreach ($filec as $line) {
         $cam = explode(",", $line);
@@ -48,5 +49,6 @@ foreach ($files as $file) {
 };
 
 replace_index_alias($index,"roadsituation_speedcamonline");
-
+echo "Finish ".date('Y-m-d H:i:s')."\r\n";
+echo "----------------------------------------\r\n";
 ?>

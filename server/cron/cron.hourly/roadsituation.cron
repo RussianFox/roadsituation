@@ -1,0 +1,2 @@
+#! /bin/sh
+curator --config /git/roadsituation/elasticsearch/curator/config.yaml --dry-run /git/roadsituation/elasticsearch/curator/roadsituation.yaml >> /var/log/curator/roadsituation.log

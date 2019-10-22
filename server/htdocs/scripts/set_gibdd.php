@@ -8,6 +8,8 @@ function numberFormat($digit, $width) {
     return $digit;
 };
 
+echo "Start ".date('Y-m-d H:i:s')."\r\n";
+
 $index="gibdd";
 
 $params = ['index' => $index];
@@ -49,6 +51,8 @@ for ($ii=1;$ii<100;$ii++) {
 
 clean_objects($index,'must_not',$ids);
 
-replace_index_alias($index,"roadsituation_gibdd")
+replace_index_alias($index,"roadsituation_gibdd");
 
+echo "Finish ".date('Y-m-d H:i:s')."\r\n";
+echo "----------------------------------------\r\n";
 ?>

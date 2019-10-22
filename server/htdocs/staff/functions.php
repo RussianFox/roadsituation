@@ -4,9 +4,6 @@ include 'config/main.php';
 include 'config/env.php';
 include 'config/elasticsearch.php';
 
-
-$types = ['cam', 'accident', 'block', 'maintenance', 'message', 'other', 'sos'];
-
 use Elasticsearch\ClientBuilder;
 require 'vendor/autoload.php';
 $client = ClientBuilder::create()->setHosts($eshosts)->build();
@@ -111,7 +108,6 @@ function vote_object($index,$id,$vote) {
 	return;
     }
 
-    
     add_error("Wrong vote");
 }
 
@@ -126,19 +122,20 @@ function check_object_type($type) {
     return false;
 }
 
-function add_object($lng, $lat, $type="other", $text="", $addition="", $source="user", $indexname=False) {
+function add_object($lng, $lat, $type="other", $text="", $addition="", $source="user") {
     global $client;
-
-    $date = new DateTime("now", new DateTimeZone("UTC"));
-    $index="roadsituation".($indexname?"_".$indexname:"")."_".($date->format('Y-m-d-H'));
 
     $index_type = check_object_type($type);
     if (!$index_type) {
 	add_error("Wrong type");
     };
 
+    $date = new DateTime("now", new DateTimeZone("UTC"));
+    $index="roadsituation_".$index_type."_".($index_type=='temporary'?$date->format('Y-m-d-H'):$date->format('Y-m-d'));
+
+
     $params = [
-	'index' => $index."_".$index_type,
+	'index' => $index,
         'body' => [
     	    'time' => time(),
     	    'type' => $type,

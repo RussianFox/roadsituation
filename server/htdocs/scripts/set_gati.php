@@ -10,7 +10,8 @@ function numberFormat($digit, $width) {
 
 $pages=['a','s','o'];
 
-$date = new DateTime("now", new DateTimeZone("UTC"));
+echo "Start ".date('Y-m-d H:i:s')."\r\n";
+
 $index="gati";
 $ids=array();
 
@@ -40,9 +41,12 @@ foreach ($pages as $ii) {
 	    update_object_int($id,$lng,$lat,$type,$name,null,$link,$index);
 	    $ids[]=$id;
 	}
+    } else {
+	echo "Failed to load ".$url." \r\n";
     }
 }
 clean_objects($index,'must_not',$ids);
 replace_index_alias($index,"roadsituation_gati");
-
+echo "Finish ".date('Y-m-d H:i:s')."\r\n";
+echo "----------------------------------------\r\n";
 ?>

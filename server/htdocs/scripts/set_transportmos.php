@@ -8,6 +8,8 @@ function numberFormat($digit, $width) {
     return $digit;
 };
 
+echo "Start ".date('Y-m-d H:i:s')."\r\n";
+
 $pages=['a','s','o'];
 
 $date = new DateTime("now", new DateTimeZone("UTC"));
@@ -88,6 +90,9 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 	
 	clean_objects($index,'must_not',$ids);
 	replace_index_alias($index,"roadsituation_transportmos");
+    } else {
+	echo "Failedload data from URL \r\n";
     }
-
+echo "Finish ".date('Y-m-d H:i:s')."\r\n";
+echo "----------------------------------------\r\n";
 ?>

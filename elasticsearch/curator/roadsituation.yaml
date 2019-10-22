@@ -1,7 +1,8 @@
+---
 actions:
   1:
     action: delete_indices
-    description: DELETE_OLD_USER_INDICIES
+    description: DELETE OLD USER INDICIES
     options:
       ignore_empty_list: True
       continue_if_exception: False
@@ -9,7 +10,7 @@ actions:
     filters:
       - filtertype: pattern
         kind: prefix
-        value: roadsituation_
+        value: roadsituation_temporary
       - filtertype: age
         source: name
         direction: older
