@@ -12,15 +12,12 @@ echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
 $pages=['a','s','o'];
 
-$date = new DateTime("now", new DateTimeZone("UTC"));
-
 $index="transportmos";
 
 $ids = array();
 
-    $datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
-
-    $context = stream_context_create(array(
+$datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
+$context = stream_context_create(array(
         'http' => array(
             'method' => 'POST',
             'header' => "
@@ -42,18 +39,16 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 
     $url = "https://transport.mos.ru/ajax/transport/";
     print_r($url);
+    echo "Start loading: $url ..... \r\n";
     $matches=false;
     $file=false;
     $file=@file_get_contents($url,null,$context);
     if ($file) {
-	echo "URL loaded\n";
-	//file_put_contents('transportmos.json', $file);
+	echo "loaded \r\n";
 	$file = json_decode($file, true);
 	$html=$file['html'];
-	//$list = preg_match_all('/(<li id="closure_id_.*<\/li>)/sUsi',$html,$matches);
 	$list = preg_match_all('/<li id="closure_id_.*<span class="sp1">(.*)<\/span>.*<span class="sp2">(.*)<\/span>.*class="moreInfo_block">(.*)<\/div>.*<\/li>/sUsi',$html,$matches);
 	
-//	var_dump($matches[2]);
 	foreach ($file['json']['features'] as $feature) {
 	
 	    $object_id=$feature['options']['object_id'];
@@ -91,7 +86,7 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 	clean_objects($index,'must_not',$ids);
 	replace_index_alias($index,"roadsituation_transportmos");
     } else {
-	echo "Failedload data from URL \r\n";
+	echo "failed \r\n";
     }
 echo "Finish ".date('Y-m-d H:i:s')."\r\n";
 echo "----------------------------------------\r\n";
