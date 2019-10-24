@@ -40,6 +40,17 @@ div.message.error {
     text-align:center;
 }
 
+.overpass-button {
+	width: 30px;
+	height: 30px;
+	background-color: white;
+	background-image: url('src/img/small/overpass.png');
+}
+
+.overpass-loading {
+	background-image: url('src/img/small/overpass-download.gif');
+}
+
 }
 </style>
 	
@@ -181,6 +192,7 @@ div.message.error {
 
 	var rsLayers = new Object
 
+	rsLayers['overpass'] = L.layerGroup().addTo(mymap)
 	rsLayers['cam'] = L.layerGroup().addTo(mymap)
 	rsLayers['other'] = L.layerGroup()
 	rsLayers['maintenance'] = L.layerGroup()
@@ -190,9 +202,10 @@ div.message.error {
 	rsLayers['sos'] = L.layerGroup()
 	
 	var overlayMaps = {
+		"Overpass": rsLayers['overpass'],
+		"Камеры": rsLayers['cam'],
 		"ДТП": rsLayers['accident'],
 		"Сообщения": rsLayers['message'],
-		"Камеры": rsLayers['cam'],
 		"Дорожные работы": rsLayers['maintenance'],
 		"Блокировки проезда": rsLayers['block'],
 		"Просьбы о помощи": rsLayers['sos'],
@@ -223,19 +236,12 @@ var overpassControl = L.Control.extend({
  
   options: {
     position: 'topleft' 
-    //control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
   },
  
   onAdd: function (map) {
-    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
- 
-    container.style.backgroundColor = 'white';
-	container.style.backgroundImage = 'url(src/img/small/click.png)';
-    container.style.width = '30px';
-    container.style.height = '30px';
- 
+    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom overpass-button');
+  
     container.onclick = function(e){
-      console.log('buttonClicked');
 	  overpassRequest();
 	  e.stopPropagation();
     }
@@ -243,10 +249,16 @@ var overpassControl = L.Control.extend({
   }
  
 });
-mymap.addControl(new overpassControl());
+overpassButton = new overpassControl()
+mymap.addControl(overpassButton);
+var ovepassLoading = false
 
 	function overpassRequest() {
-		console.log(mymap.getBounds());
+		if (ovepassLoading == true) {
+			return
+		}
+		ovepassLoading = true
+		jQuery('.overpass-button').addClass('overpass-loading');
 		bounds = mymap.getBounds()
 		$.ajax({
 			url:
@@ -265,30 +277,34 @@ mymap.addControl(new overpassControl());
 			console.log(error);
 			console.log( "error" );
 		}).always(function() {
+			ovepassLoading = false
+			jQuery('.overpass-button').removeClass('overpass-loading');
 			console.log( "complete" );
 		});
 	}
 
 	function overpassLoad(els) {
-
+		rsLayers['overpass'].clearLayers();
 		for (item in els) {
-			//L.marker([els[item].lat, els[item].lon]).bindPopup("qeqrqrqwr").addTo(mymap);
 			var to = L.latLng(els[item].lat, els[item].lon);
 			var check=1;
 			for (quadr in rsMarkers) {
 				for (marker in rsMarkers[quadr]) {
-					if (rsMarkers[quadr][marker].feature.properties.type == 'cam') {
-						var from = rsMarkers[quadr][marker].getLatLng();
-						if (from.distanceTo(to)<100) {
-							rsMarkers[quadr][marker].setIcon(rsIcons['dcam']);
-							mymap.removeLayer(rsMarkers[quadr][marker]);
-							check=0;
+					if (rsMarkers[quadr][marker].feature) {
+						if (rsMarkers[quadr][marker].feature.properties.type == 'cam') {
+							var from = rsMarkers[quadr][marker].getLatLng();
+							if (from.distanceTo(to)<100) {
+								rsMarkers[quadr][marker].setIcon(rsIcons['dcam']);
+								mymap.removeLayer(rsMarkers[quadr][marker]);
+								check=0;
+							}
 						}
 					}
 				}
 			}
 			if (check==1) {
-				L.marker([els[item].lat, els[item].lon]).bindPopup("qeqrqrqwr").addTo(mymap);
+				rsLayers['overpass'].addLayer(L.marker([els[item].lat, els[item].lon]))
+				//L.marker([els[item].lat, els[item].lon]).addTo(mymap);
 			}
 		}
 	};
@@ -444,7 +460,7 @@ mymap.addControl(new overpassControl());
 	    }
 	}
 
-	mymap.on('click', onMapClick);
+	//mymap.on('click', onMapClick);
 
 	var rsLoads = 0
 	var rsIcons = new Object();
@@ -639,7 +655,7 @@ mymap.addControl(new overpassControl());
 			}
 		}
 		
-		if (rsNewLayers.length>30) {
+		if (rsNewLayers.length>70) {
 			enableLoading=false;
 			clearMap();
 			userError("Try zooming out or downsizing the window");
