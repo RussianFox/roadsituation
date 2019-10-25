@@ -14,31 +14,41 @@
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	
 <style>
-body {
-    margin: 0;
-}
+	body {
+		margin: 0;
+	}
 
-div.message {
-    background-color: rgba(11, 209, 244, .5);
-    padding: 5;
-    display: inline-block;
-    align: center;
-}
+	div.message {
+		background-color: rgba(11, 209, 244, .5);
+		padding: 5;
+		display: inline-block;
+		align: center;
+	}
 
-div.message.error {
-    background-color: rgba(255, 51, 0, .5);
-}
+	div.message.error {
+		background-color: rgba(255, 51, 0, .5);
+	}
 
-#consoleDiv {
-    position:absolute;
-    top:5;
-    margin-left: 20%;
-    width: 60%;
-    border: 0px solid #73AD21;
-    padding: 10px;
-    z-index:900;
-    text-align:center;
-}
+	#consoleDiv {
+		position:absolute;
+		top:5;
+		margin-left: 20%;
+		width: 60%;
+		border: 0px solid #73AD21;
+		padding: 10px;
+		z-index:900;
+		text-align:center;
+	}
+
+	.download-control {
+		width: 40px;
+		height: 30px;
+		background-color: transparent;
+	}
+
+	.download-now {
+		background-image: url('src/img/medium/download.gif');
+	}
 
 }
 </style>
@@ -216,6 +226,18 @@ div.message.error {
 	};
 
 	L.control.layers(baseMaps, overlayMaps).addTo(mymap);
+
+	var downloadControl = L.Control.extend({
+	  options: {
+		position: 'topright' 
+	  },
+	  onAdd: function (map) {
+		var container = L.DomUtil.create('div', 'download-control download-now');
+		return container;
+	  }
+	});
+
+	mymap.addControl(new downloadControl());
 
 	rsDebug=false
 	popupContent = $('#tabs')[0].innerHTML
@@ -452,7 +474,8 @@ div.message.error {
 		if (rsLoads>15) {
 			return false;
 		}
-		rsLoads++
+		rsLoads = rsLoads+1
+		jQuery('.download-control').addClass('download-now');
 		if (rsMarkers[quadr] == 'needLoad') {
 			rsMarkers[quadr] = new Object
 		}
@@ -490,6 +513,9 @@ div.message.error {
 			})
 		}).always(function() {
 			rsLoads = Math.max(0,rsLoads-1)
+			if (rsLoads == 0) {
+				jQuery('.download-control').removeClass('download-now');
+			}
 		});
 	}
 	

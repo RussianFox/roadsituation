@@ -51,6 +51,16 @@ div.message.error {
 	background-image: url('src/img/small/overpass-download.gif');
 }
 
+.download-control {
+	width: 40px;
+	height: 30px;
+	background-color: transparent;
+}
+
+.download-now {
+	background-image: url('src/img/medium/download.gif');
+}
+
 }
 </style>
 	
@@ -231,6 +241,15 @@ div.message.error {
 
 	L.control.layers(baseMaps, overlayMaps).addTo(mymap);
 
+var downloadControl = L.Control.extend({
+  options: {
+    position: 'topright' 
+  },
+  onAdd: function (map) {
+    var container = L.DomUtil.create('div', 'download-control download-now');
+    return container;
+  }
+});
 
 var overpassControl = L.Control.extend({
  
@@ -249,8 +268,8 @@ var overpassControl = L.Control.extend({
   }
  
 });
-overpassButton = new overpassControl()
-mymap.addControl(overpassButton);
+mymap.addControl(new overpassControl());
+mymap.addControl(new downloadControl());
 var ovepassLoading = false
 
 	function overpassRequest() {
@@ -545,7 +564,8 @@ var ovepassLoading = false
 		if (rsLoads>15) {
 			return false;
 		}
-		rsLoads++
+		rsLoads = rsLoads+1
+		jQuery('.download-control').addClass('download-now');
 		if (rsMarkers[quadr] == 'needLoad') {
 			rsMarkers[quadr] = new Object
 		}
@@ -583,6 +603,9 @@ var ovepassLoading = false
 			})
 		}).always(function() {
 			rsLoads = Math.max(0,rsLoads-1)
+			if (rsLoads == 0) {
+				jQuery('.download-control').removeClass('download-now');
+			}
 		});
 	}
 	
