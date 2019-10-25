@@ -290,15 +290,12 @@ var ovepassLoading = false
 			async: true,
 			crossDomain: true
 		}).done(function(e) {
-			console.log( e );
 			overpassLoad(e.elements);
 		}).fail(function(error) {
-			console.log(error);
-			console.log( "error" );
+			debug(error);
 		}).always(function() {
 			ovepassLoading = false
 			jQuery('.overpass-button').removeClass('overpass-loading');
-			console.log( "complete" );
 		});
 	}
 
@@ -538,20 +535,15 @@ var ovepassLoading = false
 	
 		$.post( "set.php", { confirm: '', index: index, id: id, val: val})
 		  .done(function( data ) {
-			if (debug) {
-				console.log(data)
-			}
+			debug(data)
 			userMessage( "Add object success" );
 		  })
 		  .fail(function() {
-			if (debug) {
-				console.log(data)
-			}
+			debug(data)
 			userError( "Add object failed" );
-		  });
+		  }
+		);
 	
-	
-		console.log(''+index+' '+id+' '+val);
 	}
 	
 	function objectPopup(e) {

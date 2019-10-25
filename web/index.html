@@ -448,20 +448,13 @@
 	
 		$.post( "set.php", { confirm: '', index: index, id: id, val: val})
 		  .done(function( data ) {
-			if (debug) {
-				console.log(data)
-			}
+			debug(data)
 			userMessage( "Add object success" );
 		  })
 		  .fail(function() {
-			if (debug) {
-				console.log(data)
-			}
+			debug(data)
 			userError( "Add object failed" );
 		  });
-	
-	
-		console.log(''+index+' '+id+' '+val);
 	}
 	
 	function objectPopup(e) {
