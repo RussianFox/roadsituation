@@ -299,6 +299,15 @@ var ovepassLoading = false
 		});
 	}
 
+	function overpassPopup(el) {
+		text = ''
+		text = text+'<a target=_blank href="https://www.openstreetmap.org/'+el.type+'/'+el.id+'">'+el.id+'</a><br />'
+		for (tag in el.tags) {
+			text = text+'<span  style="display: block"><b>'+tag+'</b>: '+(is_url(el.tags[tag]) ? '<a target=_blank href="'+el.tags[tag]+'">'+el.tags[tag]+'</a>' : el.tags[tag])+'</span>'
+		}
+		return text
+	}
+
 	function overpassLoad(els) {
 		rsLayers['overpass'].clearLayers();
 		for (item in els) {
@@ -319,7 +328,7 @@ var ovepassLoading = false
 				}
 			}
 			if (check==1) {
-				rsLayers['overpass'].addLayer(L.marker([els[item].lat, els[item].lon]))
+				rsLayers['overpass'].addLayer(L.marker([els[item].lat, els[item].lon]).bindPopup(overpassPopup(els[item])))
 				//L.marker([els[item].lat, els[item].lon]).addTo(mymap);
 			}
 		}
