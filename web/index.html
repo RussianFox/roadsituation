@@ -197,6 +197,7 @@
 	rsLayers['message'] = L.layerGroup().addTo(mymap)
 	rsLayers['accident'] = L.layerGroup().addTo(mymap)
 	rsLayers['sos'] = L.layerGroup().addTo(mymap)
+	rsLayers['azs'] = L.layerGroup()
 	
 	var overlayMaps = {
 		"ДТП": rsLayers['accident'],
@@ -205,6 +206,7 @@
 		"Дорожные работы": rsLayers['maintenance'],
 		"Блокировки проезда": rsLayers['block'],
 		"Просьбы о помощи": rsLayers['sos'],
+		"Заправки": rsLayers['azs'],
 		"Другое": rsLayers['other']
 	};
 
@@ -326,6 +328,7 @@
 		'block': 'Движение заблокировано',
 		'message': 'Сообщение',
 		'sos': 'Просьба о помощи',
+		'azs': 'Заправочная станция',
 		'other': 'Иное',
 	}
 
@@ -337,9 +340,9 @@
 	}
 
 	function ParseData(gdate) {
-		var ndate = new Date();
-		ndate.setTime(gdate*1000);
-        var hours = ndate.getHours().toString().padStart(2, '0');
+	var ndate = new Date();
+	ndate.setTime(gdate*1000);
+	var hours = ndate.getHours().toString().padStart(2, '0');
         var minutes = ndate.getMinutes().toString().padStart(2, '0');
         var seconds = ndate.getSeconds().toString().padStart(2, '0');
         var day = ndate.getDate().toString().padStart(2, '0');
@@ -418,6 +421,7 @@
 	rsIcons['accident'] = new rsIcon({iconUrl: 'src/img/small/accident.png'});
 	rsIcons['block'] = new rsIcon({iconUrl: 'src/img/small/block.png'});
 	rsIcons['sos'] = new rsIcon({iconUrl: 'src/img/small/sos.png'});
+	rsIcons['azs'] = new rsIcon({iconUrl: 'src/img/small/azs.png'});
 	
 	rsIcons['message'] = L.icon(
 		{
