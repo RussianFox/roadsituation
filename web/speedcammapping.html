@@ -318,7 +318,7 @@ var ovepassLoading = false
 					if (rsMarkers[quadr][marker].feature) {
 						if (rsMarkers[quadr][marker].feature.properties.type == 'cam') {
 							var from = rsMarkers[quadr][marker].getLatLng();
-							if (from.distanceTo(to)<100) {
+							if (from.distanceTo(to)<30) {
 								rsMarkers[quadr][marker].setIcon(rsIcons['dcam']);
 								mymap.removeLayer(rsMarkers[quadr][marker]);
 								check=0;
