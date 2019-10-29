@@ -581,6 +581,9 @@ var ovepassLoading = false
 			}
 			var rsNewMarkers = []
 			data.items.forEach(function(item) {
+				if (item._source.type != 'cam') {
+					return
+				}
 				if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
 					link=item._source.source
 					if (is_url(link)) {
