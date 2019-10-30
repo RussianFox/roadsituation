@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+	
 <style>
 body {
     margin: 0;
@@ -198,8 +200,16 @@ div.message.error {
 		timeout:28000 // in milliseconds 
 	});
 
-	var mymap = L.map('mapid').setView([59.023,30.123], 13);
-
+	var mymap = L.map('mapid');
+	
+	if (Cookies.get('mapCenter')) {
+		var lat, lng, zoom
+		savePos = Cookies.get('mapCenter').split(',')
+		mymap.setView([Number(savePos[0]),Number(savePos[1])], Number(savePos[2]))
+	} else {
+		mymap.setView([59.023,30.123], 13)
+	}
+	
 	var rsLayers = new Object
 
 	rsLayers['overpass'] = L.layerGroup().addTo(mymap)
@@ -292,6 +302,7 @@ var ovepassLoading = false
 		}).done(function(e) {
 			overpassLoad(e.elements);
 		}).fail(function(error) {
+			userError(error)
 			debug(error);
 		}).always(function() {
 			ovepassLoading = false
@@ -310,18 +321,26 @@ var ovepassLoading = false
 
 	function overpassLoad(els) {
 		rsLayers['overpass'].clearLayers();
+		removedLayers = {}
 		for (item in els) {
 			var to = L.latLng(els[item].lat, els[item].lon);
 			var check=1;
+			quadrloop:
 			for (quadr in rsMarkers) {
+				markerloop:
 				for (marker in rsMarkers[quadr]) {
 					if (rsMarkers[quadr][marker].feature) {
 						if (rsMarkers[quadr][marker].feature.properties.type == 'cam') {
+							if (removedLayers[quadr][marker]) {
+								break markerloop;
+							}
 							var from = rsMarkers[quadr][marker].getLatLng();
 							if (from.distanceTo(to)<30) {
 								rsMarkers[quadr][marker].setIcon(rsIcons['dcam']);
 								mymap.removeLayer(rsMarkers[quadr][marker]);
+								removedLayers[quadr][marker] = 1
 								check=0;
+								break quadrloop;
 							}
 						}
 					}
@@ -562,7 +581,7 @@ var ovepassLoading = false
 	}
 	
 	function loadQuadr(quadr) {
-		if (rsLoads>15) {
+		if (rsLoads>20) {
 			return false;
 		}
 		rsLoads = rsLoads+1
@@ -708,8 +727,18 @@ var ovepassLoading = false
 		
 	}
 	
+	function saveMapPosition() {
+		Cookies.set('mapCenter', mymap._lastCenter.lat+', '+mymap._lastCenter.lng+', '+mymap._zoom);
+	}
+	
 	$('.leaflet-container').css('cursor','crosshair');
 	mymap.on('moveend', changeQuadrs);
+	mymap.on('dragend', function() {
+		saveMapPosition()  
+	});
+	mymap.on('zoomend', function() {
+		saveMapPosition()  
+	});
 	changeQuadrs();
 	loadMarkers();
 	
