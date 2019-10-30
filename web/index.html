@@ -12,6 +12,7 @@
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
 	
 <style>
 	body {
@@ -186,7 +187,15 @@
 		timeout:28000 // in milliseconds 
 	});
 
-	var mymap = L.map('mapid').setView([59.023,30.123], 13);
+	var mymap = L.map('mapid');
+	
+	if (Cookies.get('mapCenter')) {
+		var lat, lng, zoom
+		savePos = Cookies.get('mapCenter').split(',')
+		mymap.setView([Number(savePos[0]),Number(savePos[1])], Number(savePos[2]))
+	} else {
+		mymap.setView([59.023,30.123], 13)
+	}
 
 	var rsLayers = new Object
 
@@ -618,6 +627,15 @@
 	}
 	
 	$('.leaflet-container').css('cursor','crosshair');
+	function saveMapPosition() {
+		Cookies.set('mapCenter', mymap._lastCenter.lat+', '+mymap._lastCenter.lng+', '+mymap._zoom);
+	}
+	mymap.on('dragend', function() {
+		saveMapPosition()  
+	});
+	mymap.on('zoomend', function() {
+		saveMapPosition()  
+	});
 	mymap.on('moveend', changeQuadrs);
 	changeQuadrs();
 	loadMarkers();
