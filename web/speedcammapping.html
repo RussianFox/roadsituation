@@ -302,7 +302,7 @@ var ovepassLoading = false
 		}).done(function(e) {
 			overpassLoad(e.elements);
 		}).fail(function(error) {
-			userError(error)
+			userError('Error loading from http://overpass-api.de/ Try again later.')
 			debug(error);
 		}).always(function() {
 			ovepassLoading = false
@@ -319,35 +319,78 @@ var ovepassLoading = false
 		return text
 	}
 
+var greenIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var redIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 	function overpassLoad(els) {
 		rsLayers['overpass'].clearLayers();
-		removedLayers = {}
 		for (item in els) {
 			var to = L.latLng(els[item].lat, els[item].lon);
 			var check=1;
+			var source1 = false
+			var source2 = false
+			var icon = greenIcon
+			if (els[item].tags.source) {
+				source1 = els[item].tags.source
+				mm = source1.split(';')
+				if (mm.length > 1) {
+					source2 = mm[1]
+				}
+			}
+			if (els[item].tags.source2) {
+				source2 = els[item].tags.source2
+			}
 			quadrloop:
 			for (quadr in rsMarkers) {
 				markerloop:
 				for (marker in rsMarkers[quadr]) {
 					if (rsMarkers[quadr][marker].feature) {
 						if (rsMarkers[quadr][marker].feature.properties.type == 'cam') {
-							if (removedLayers[quadr][marker]) {
-								break markerloop;
+							needcheck=false
+							if (source1) {
+								if (rsMarkers[quadr][marker].feature.properties.source == source1) {
+									needcheck=true
+								}
 							}
-							var from = rsMarkers[quadr][marker].getLatLng();
-							if (from.distanceTo(to)<30) {
-								rsMarkers[quadr][marker].setIcon(rsIcons['dcam']);
-								mymap.removeLayer(rsMarkers[quadr][marker]);
-								removedLayers[quadr][marker] = 1
-								check=0;
-								break quadrloop;
+							if (source2) {
+								if (rsMarkers[quadr][marker].feature.properties.source == source2) {
+									needcheck=true
+								}
+							}
+							if (needcheck) {
+								from = rsMarkers[quadr][marker]._latlng
+								if (from.distanceTo(to)<30) {
+									rsMarkers[quadr][marker].setIcon(rsIcons['dcam']);
+									mymap.removeLayer(rsMarkers[quadr][marker]);
+									check=0;
+									break markerloop;
+								} else {
+									//добавить линию
+									rsLayers['overpass'].addLayer(L.polyline([from,to]))
+									icon = redIcon
+								}
 							}
 						}
 					}
 				}
 			}
 			if (check==1) {
-				rsLayers['overpass'].addLayer(L.marker([els[item].lat, els[item].lon]).bindPopup(overpassPopup(els[item])))
+				rsLayers['overpass'].addLayer(L.marker([els[item].lat, els[item].lon], {icon: icon}).bindPopup(overpassPopup(els[item])))
 				//L.marker([els[item].lat, els[item].lon]).addTo(mymap);
 			}
 		}
@@ -608,11 +651,13 @@ var ovepassLoading = false
 					if (is_url(link)) {
 						link="<a target=_blank href='"+link+"'>"+link+"</a>"
 					} else if (typeof(link) == 'undefined') {
-						link=''
+						link=false
 					}
 					addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
-					rsMarkers[quadr][item._index+item._id] = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup("<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div><a class='ui-button confirm-button'><span class=' ui-icon ui-icon-plusthick'></span>Подтвердить</a> <a class='ui-button disprove-button'><span class=' ui-icon ui-icon-minusthick'></span>Опровергнуть</a></div><div style='text-align:right'>"+link+"</div>").on('popupopen', objectPopup);
-					rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type}}
+					popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div><a class='ui-button confirm-button'><span class=' ui-icon ui-icon-plusthick'></span>Подтвердить</a> <a class='ui-button disprove-button'><span class=' ui-icon ui-icon-minusthick'></span>Опровергнуть</a></div><div style='text-align:right'>"+link+"</div>"
+					newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
+					newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source}}
+					rsMarkers[quadr][item._index+item._id] = newMarker
 					rsLayers[item._source.type].addLayer(rsMarkers[quadr][item._index+item._id]);
 				}
 				rsNewMarkers.push(''+item._index+item._id)
