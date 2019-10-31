@@ -655,7 +655,7 @@ var redIcon = new L.Icon({
 						link=false
 					}
 					addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
-					popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div><a class='ui-button confirm-button'><span class=' ui-icon ui-icon-plusthick'></span>Подтвердить</a> <a class='ui-button disprove-button'><span class=' ui-icon ui-icon-minusthick'></span>Опровергнуть</a></div><div style='text-align:right'>"+link+"</div>"
+					popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p><div style='text-align:right'>"+link+"</div>"
 					newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
 					newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source}}
 					rsMarkers[quadr][item._index+item._id] = newMarker
