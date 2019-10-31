@@ -349,16 +349,17 @@ var redIcon = new L.Icon({
 				source1 = els[item].tags.source
 				mm = source1.split(';')
 				if (mm.length > 1) {
+					source1 = mm[0]
 					source2 = mm[1]
 				}
 			}
 			if (els[item].tags.source2) {
 				source2 = els[item].tags.source2
 			}
-			quadrloop:
 			for (quadr in rsMarkers) {
-				markerloop:
+				quadrloop:
 				for (marker in rsMarkers[quadr]) {
+					markerloop:
 					if (rsMarkers[quadr][marker].feature) {
 						if (rsMarkers[quadr][marker].feature.properties.type == 'cam') {
 							needcheck=false
