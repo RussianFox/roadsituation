@@ -10,6 +10,7 @@ function numberFormat($digit, $width) {
 
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
+$ex_regs=array(20,80,81,84,85,88,90,91,93,94);
 $index="gibdd";
 
 $params = ['index' => $index];
@@ -18,16 +19,30 @@ if (!$bool) {
     $response = $client->indices()->create($params);
 }
 
+$need_clean=true;
 $ids=array();
-for ($ii=1;$ii<100;$ii++) {
-    $reg=$ii;
-    $url = "https://xn--90adear.xn--p1ai/r/".numberFormat($ii, 2)."/milestones/";
-    // echo $url
+for ($ii=1;$ii<96;$ii++) {
 
+    if (in_array($ii,$ex_regs)) { continue; };
+
+    $url = "https://xn--90adear.xn--p1ai/r/".numberFormat($ii, 2)."/milestones/";
+    echo "Region $ii\n";
+
+    $file=false;
+    $need_continue=5;
+    while ($need_continue>0) {
+	$need_continue--;
+        $file=@file_get_contents($url);
+        if ($file) {
+    	    $need_continue=0;
+        } else {
+    	    echo "Attempt loading failed\n";
+    	    sleep(3);
+        }
+    };
+    
     $i=0;
     $matches=false;
-    $file=false;
-    $file=@file_get_contents($url);
     if ($file) {
 	preg_match_all('/balloonContentBody.*\/milestones\/(.*)\/.*balloonContentHeader: "(.*)".*coordinates:.*\[(.*), (.*)\]/sUsi',$file, $matches);
         //print_r($matches);
@@ -44,12 +59,18 @@ for ($ii=1;$ii<100;$ii++) {
 		echo "Failed: $lat|$lng $name ($link)\n";
 	    };
 	    $ids[]=$id;
-	}
+	};
+	echo "Region loaded success: $i\n";
+    } else {
+	echo "Region loading failed\n";
+	$need_clean=false;
     }
-    echo "Region $ii: $i\n";
 }
 
-clean_objects($index,'must_not',$ids);
+if ($need_clean) {
+    echo "Starting cleaning...\n";
+    clean_objects($index,'must_not',$ids);
+};
 
 replace_index_alias($index,"roadsituation_gibdd");
 
