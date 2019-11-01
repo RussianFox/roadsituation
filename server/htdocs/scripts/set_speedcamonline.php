@@ -18,37 +18,59 @@ $opts = [
 $context = stream_context_create($opts);
 
 $files=array();
-//$files[] = "https://speedcamonline.ru/primo/Rus/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/Ukraine/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/Latvija/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/GE/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/uz/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/tm/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/kz/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/by/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/Fin/nomobile/";
-$files[] = "https://speedcamonline.ru/primo/EU/nomobile/";
+$files[] = "Rus";
+$files[] = "Ukraine";
+$files[] = "Latvija";
+$files[] = "GE";
+$files[] = "uz";
+$files[] = "tm";
+$files[] = "kz";
+$files[] = "by";
+$files[] = "Fin";
+$files[] = "EU";
+
+$ids=false;
+$needclean=true;
 
 foreach ($files as $file) {
-    echo $file."\r\n";
-    $filec = file('https://speedcamonline.ru/primo/Ukraine/nomobile/',false,$context);
-    foreach ($filec as $line) {
-        $cam = explode(",", $line);
-        if (count($cam)==7) {
-    	    $id=1*trim($cam[0]);
-	    $lng=1*trim($cam[1]);
-	    $lat=1*trim($cam[2]);
-	    $speed=1*trim($cam[4]);
-	    $direction=1*trim($cam[5]);
-	    if ( ($speed>0) and ($direction>0) ) {
-		$text="Speed: ".$speed." ".($direction==1?"one way":"in both direction");
-		update_object_int($file.$id,$lng,$lat,"cam",$text,null,"http://speedcamonline.ru/point/$file/$id",$index);
+    echo "Region ".$file."\r\n";
+    $url = "https://speedcamonline.ru/primo/$file/nomobile/";
+    echo "File ".$url;
+    $filec = @file($url,false,$context);
+    if ($filec) {
+	$ii=0;
+	echo "loaded success\r\n";
+        foreach ($filec as $line) {
+	    $cam = explode(",", $line);
+    	    if (count($cam)==7) {
+    		$ii++;
+    		$id=$file.(1*trim($cam[0]));
+		$lng=1*trim($cam[1]);
+		$lat=1*trim($cam[2]);
+	        $speed=1*trim($cam[4]);
+		$direction=1*trim($cam[5]);
+		$text="";
+		if ( ($speed>0) and ($direction>0) ) {
+		    $text="Speed: ".$speed." ".($direction==1?"one way":"in both direction");
+		};
+		update_object_int($id,$lng,$lat,"cam",$text,null,"http://speedcamonline.ru/point/$file/$id",$index);
+		$ids[]=$id;
 	    }
-	}
+	};
+	echo "Objects: $ii\r\n";
+    } else {
+	echo "loading failed\r\n";
+	$needclean=false;
     }
 };
 
-replace_index_alias($index,"roadsituation_speedcamonline");
+if ($needclean) {
+    echo "Start cleaning";
+    clean_objects($index,'must_not',$ids);
+};
+
+replace_index_alias($index,"roadsituation_$index");
+
 echo "Finish ".date('Y-m-d H:i:s')."\r\n";
 echo "----------------------------------------\r\n";
 ?>
