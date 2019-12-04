@@ -183,6 +183,16 @@
 <div id="mapid" style="width: 100%; height: 100%;"></div>
 <script>
 
+	var rsDebug=true
+
+	var rsLayers = new Object
+	var rsLoadQuadrs = new Object
+	
+	var rsMarkers = new Object
+	var rsLoads = 0
+	var rsIcons = new Object();
+	enableLoading = false
+
 	$.ajaxSetup({
 		timeout:28000 // in milliseconds 
 	});
@@ -196,8 +206,6 @@
 	} else {
 		mymap.setView([59.023,30.123], 13)
 	}
-
-	var rsLayers = new Object
 
 	rsLayers['cam'] = L.layerGroup().addTo(mymap)
 	rsLayers['other'] = L.layerGroup().addTo(mymap)
@@ -250,7 +258,6 @@
 
 	mymap.addControl(new downloadControl());
 
-	rsDebug=false
 	popupContent = $('#tabs')[0].innerHTML
 	var popup = L.popup({ maxWidth: 325, closeOnClick: false, autoClose: false, closeButton: false}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
 	$('#tabs').remove()
@@ -270,6 +277,19 @@
 	function userError(text) {
 		$("<div class='message error'>"+text+"</div><br>").appendTo('#consoleDiv')
 			.delay(2000).queue(function() { $(this).remove(); });
+	}
+
+	function urlString(str,delim) {
+		rstr=''
+		strs = str.split(';')
+		strs.forEach(function(e) {
+			if (is_url(e)) {
+				rstr=rstr+delim+'<a class=source_link target=_blank href="'+e+'">'+e+'</a>'
+			} else {
+				rstr=rstr+delim+e
+			}
+		})
+		return rstr;
 	}
 
 	function parseAdditions(str) {
@@ -408,12 +428,8 @@
 	    }
 	}
 
-	mymap.on('click', onMapClick);
-
-	var rsLoads = 0
-	var rsIcons = new Object();
-	var rsMarkers = new Object();
-	enableLoading = false
+	mymap.doubleClickZoom.disable();
+	mymap.on('dblclick', onMapClick);
 
 	var rsIcon = L.Icon.extend({
 		options: {
@@ -483,19 +499,26 @@
 	}
 	
 	function loadQuadr(quadr) {
-		if (rsLoads>15) {
+		if (rsLoads>20) {
 			return false;
 		}
 		rsLoads = rsLoads+1
+		debug(rsLoads+' (+)')
 		jQuery('.download-control').addClass('download-now');
-		if (rsMarkers[quadr] == 'needLoad') {
+		if (rsMarkers[quadr] == undefined) {
 			rsMarkers[quadr] = new Object
 		}
+		if (rsLoadQuadrs[quadr]) {
+			delete rsLoadQuadrs[quadr]
+		}
 
-		$.getJSON('get.php?quadr='+quadr, function(data) {
+		$.getJSON('https://roadsituation.lisss.website/get.php?quadr='+quadr, function(data) {
 
 			quadr=data.quadr.id
 			debug('Loaded '+quadr)
+			if (rsLoadQuadrs[quadr]) {
+				delete rsLoadQuadrs[quadr]
+			}
 			//rsMarkers[quadr] = new Object
 			if (typeof(rsMarkers[quadr]) == 'undefined') {
 				rsMarkers[quadr] = new Object;
@@ -503,16 +526,12 @@
 			var rsNewMarkers = []
 			data.items.forEach(function(item) {
 				if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
-					link=item._source.source
-					if (is_url(link)) {
-						link="<a target=_blank href='"+link+"'>"+link+"</a>"
-					} else if (typeof(link) == 'undefined') {
-						link=''
-					}
+					link=urlString(item._source.source,' ')
 					addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
-					rsMarkers[quadr][item._index+item._id] = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup("<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div><a class='ui-button confirm-button'><span class=' ui-icon ui-icon-plusthick'></span>Подтвердить</a> <a class='ui-button disprove-button'><span class=' ui-icon ui-icon-minusthick'></span>Опровергнуть</a></div><div style='text-align:right'>"+link+"</div>").on('popupopen', objectPopup);
-					rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id}}
-					rsLayers[item._source.type].addLayer(rsMarkers[quadr][item._index+item._id]);
+					popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div lat='"+item._source.location.lat+"' lng='"+item._source.location.lon+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
+					newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
+					newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: link}}
+					rsMarkers[quadr][item._index+item._id] = newMarker
 				}
 				rsNewMarkers.push(''+item._index+item._id)
 			});
@@ -520,27 +539,30 @@
 			rsOldMarkers.forEach(function(element) {
 				if (!rsNewMarkers.includes(element)) {
 					mymap.removeLayer(rsMarkers[quadr][element])
-					delete rsMarkers[quadr][parseInt(element)]
+					delete rsMarkers[quadr][element]
 				}
+				showMarker(quadr,element)
 			})
 		}).always(function() {
 			rsLoads = Math.max(0,rsLoads-1)
 			if (rsLoads == 0) {
 				jQuery('.download-control').removeClass('download-now');
+				if (Object.keys(rsLoadQuadrs).length > 0) {
+					loadMarkers(true);
+				}
 			}
+			debug(rsLoads+' (-)')
 		});
 	}
 	
 	function deleteQuadr(quadr) {
-		if (rsMarkers[quadr] == 'needLoad') {
-		
-		} else {
+		if (rsMarkers[quadr] != undefined) {
 			$.each(rsMarkers[quadr], function(id, item) {
 				mymap.removeLayer(item);
 			})
+			delete rsMarkers[quadr]
+			debug('Deleted  '+quadr)
 		}
-		delete rsMarkers[quadr]
-		debug('Deleted  '+quadr)
 	}
 	
 	function loadMarkers(onlyNew=false) {
@@ -548,16 +570,15 @@
 			debug("Loading is stoped")
 			return
 		}
-		debug('Start loading...')
 		if (onlyNew) {
+			debug('Start loading new...')
 			loadingLayers = []
-			for (var prop in rsMarkers) {
-				if (rsMarkers[prop] == 'needLoad') {
-					loadingLayers.push(prop);
-				}
+			for (var prop in rsLoadQuadrs) {
+				loadingLayers.push(prop);
 			}
 		} else {
-			loadingLayers = Object.keys(rsMarkers)
+			debug('Start loading all...')
+			loadingLayers = Object.keys(rsMarkers).concat(Object.keys(rsLoadQuadrs))
 		}
 		loadingLayers.forEach(function(element) {
 			loadQuadr(element);
@@ -565,13 +586,35 @@
 	}
 	
 	function clearMap() {
-		rsOldLayers = Object.keys(rsMarkers)
-		rsOldLayers.forEach(function(element) {
-			deleteQuadr(parseInt(element))
+		$.each(rsLayers, function(id, item) {
+			item.clearLayers();
 		})
+		rsMarkers = new Object;
+	}
+	
+	function inMap(lat,lng) {
+		return mymap.getBounds().contains(L.latLng(lat, lng));
+	}
+	
+	function showMarker(quadr,element) {
+		if (rsMarkers[quadr] != undefined) {
+			if (rsMarkers[quadr][element] != undefined) {
+				marker = rsMarkers[quadr][element]
+				if (!enableLoading) {
+					mymap.removeLayer(marker);
+				} else {
+					if (inMap(marker._latlng.lat, marker._latlng.lng)) {
+						rsLayers[marker.feature.properties.type].addLayer(marker);
+					} else {
+						mymap.removeLayer(marker);
+					}
+				}
+			}
+		}
 	}
 	
 	function changeQuadrs(e) {
+	
 		var bounds = mymap.getBounds();
 		bounds._northEast.lat;
 		bounds._northEast.lon;
@@ -600,7 +643,7 @@
 			}
 		}
 		
-		if (rsNewLayers.length>30) {
+		if (rsNewLayers.length>200) {
 			enableLoading=false;
 			clearMap();
 			userError("Try zooming out or downsizing the window");
@@ -618,7 +661,7 @@
 		
 		rsNewLayers.forEach(function(element) {
 			if (!rsOldLayers.includes(''+element)) {
-				rsMarkers[element] = 'needLoad';
+				rsLoadQuadrs[element] = true;
 			}
 		})
 		
@@ -626,21 +669,33 @@
 		
 	}
 	
+	function changeMap() {
+		for(var quadr in rsMarkers) {
+			for(var element in rsMarkers[quadr]) {
+				showMarker(quadr,element);
+			}
+		}
+	}
+	
 	$('.leaflet-container').css('cursor','crosshair');
 	function saveMapPosition() {
-		Cookies.set('mapCenter', mymap._lastCenter.lat+', '+mymap._lastCenter.lng+', '+mymap._zoom);
+		Cookies.set('mapCenter', mymap._lastCenter.lat+', '+mymap._lastCenter.lng+', '+mymap._zoom, { expires:365 });
 	}
+	
+	mymap.on('moveend', changeQuadrs);
 	mymap.on('dragend', function() {
-		saveMapPosition()  
+		saveMapPosition()
+		changeMap()
 	});
 	mymap.on('zoomend', function() {
-		saveMapPosition()  
+		saveMapPosition() 
+		changeMap()
 	});
-	mymap.on('moveend', changeQuadrs);
+	
 	changeQuadrs();
 	loadMarkers();
 	
-	setInterval(function(){ loadMarkers(true); }, 2000);
+	setInterval(function(){ loadMarkers(true); }, 1000);
 	setInterval(function(){ loadMarkers(false); }, 30000);
 	
 	$( function() {
