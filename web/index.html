@@ -183,6 +183,32 @@
 <div id="mapid" style="width: 100%; height: 100%;"></div>
 <script>
 
+
+function geoToMercator (longitude, latitude) {
+	var Rn = 6378137, // Экваториальный радиус
+	e = 0.0818191908426 // Эксцентриситет
+	esinLat = e * Math.sin(latitude);
+    var tan_temp = Math.tan(Math.PI / 4.0 + latitude / 2.0),
+         pow_temp = Math.pow(Math.tan(Math.PI / 4.0 + Math.asin(esinLat) / 2), e),
+        U = tan_temp / pow_temp;
+
+    return [Rn * longitude, Rn * Math.log(U)];
+}
+
+
+function mercatorToPixels (p) {
+	var equatorLength = 40075016.685578488, //Длина экватора
+	worldSize = Math.pow(2, 31), // Размер мира в пикселах
+	a = worldSize / equatorLength,
+	b = equatorLength /2;
+    return new Point(
+        Math.round((this._b + p.x) * this._a),
+        Math.round((this._b - p.y) * this._a)
+    );
+}
+
+
+
 	var rsDebug=true
 
 	var rsLayers = new Object
