@@ -16,7 +16,9 @@ $index="transportmos";
 
 $ids = array();
 
-$datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
+//$datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
+$datar = array('action' => 'get_road_closures_coordinates', 'dt' => date('H:i d.m.Y'));
+
 $context = stream_context_create(array(
         'http' => array(
             'method' => 'POST',

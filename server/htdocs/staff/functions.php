@@ -4,13 +4,109 @@ include 'config/main.php';
 include 'config/env.php';
 include 'config/elasticsearch.php';
 
+require_once('yandex.class.php');
+
 use Elasticsearch\ClientBuilder;
 require 'vendor/autoload.php';
 $client = ClientBuilder::create()->setHosts($eshosts)->build();
 
+function yandexTile($lng1,$lat1,$lng2,$lat2,$zoom) {
+    $yandex = new Point(0,0);
+    $tile1 = $yandex->fromGeoPoint ($lng1, $lat1, $zoom);
+    $tile2 = $yandex->fromGeoPoint ($lng2, $lat2, $zoom);
+    
+    return array(
+		    'xmax'=>max(intdiv($tile1->x,256),intdiv($tile2->x,256)),
+		    'xmin'=>min(intdiv($tile1->x,256),intdiv($tile2->x,256)),
+		    'ymax'=>max(intdiv($tile1->y,256),intdiv($tile2->y,256)),
+		    'ymin'=>min(intdiv($tile1->y,256),intdiv($tile2->y,256))
+		);
+    //var_dump($tile->x,);
+}
+
 function correct_coords($x,$min,$max) {
     $xn = ((($x-$min)%($max-$min))+$max-$min)%($max-$min)+$min;
     return $xn;
+}
+
+function point_in_coords($point,$coords) {
+
+    if (( $point['lon']<min($coords['x1'],$coords['x2']) ) or ( $point['lon']>max($coords['x1'],$coords['x2']) ))  {
+	return FALSE;
+    };
+    
+    if (( $point['lat']<min($coords['y1'],$coords['y2']) ) or ( $point['lat']>max($coords['y1'],$coords['y2']) ))  {
+	return FALSE;
+    };
+    
+    return TRUE;
+
+}
+
+function yandex_quadr($coords) {
+    $arr=array();
+
+    $selsh = array('addition'=>null,'confirm'=>0,'discard'=>0,'geometry'=>null,'source'=>'maps.yandex.ru','time'=>'','type'=>'accident','location'=>array('lat'=>0,'lon'=>0));
+    $elsh = array('_index'=>'yandex','_score'=>1,'_type'=>'_doc','_source'=>$selsh);
+
+    $tm=time();
+    $ZZ=14;
+
+    $yandexBox = yandexTile($coords['x1'],$coords['y1'],$coords['x2'],$coords['y2'],$ZZ);
+
+    $context = stream_context_create(array(
+	'http' => array(
+    	    'method' => 'GET',
+    	    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+        ),
+    ));
+
+    for ($XX=$yandexBox['xmin']; $XX<=$yandexBox['xmax']; $XX++) {
+	for ($YY=$yandexBox['ymin']; $YY<=$yandexBox['ymax']; $YY++) {
+            $url = "https://core-jams-rdr.maps.yandex.net/1.1/tiles?trf&l=trje&lang=ru&x=$XX&y=$YY&z=$ZZ&scale=1&tm=$tm&format=json";
+            $file=false;
+            $file=@file($url,FALSE,$context);
+            if ($file) {
+                $file = json_decode($file[0],TRUE,15);
+                if (array_key_exists('error',$file)) {
+                    continue;
+                }
+                foreach ($file['data']['features'] as $feature) {
+                    if ($feature['properties']['eventType']==1) {
+                        $lat=$feature['geometry']['coordinates'][0];
+                        $lon=$feature['geometry']['coordinates'][1];
+                        
+                        if (!point_in_coords(array('lat'=>$lat,'lon'=>$lon),$coords)) {
+                    	    continue;
+                        };
+                        
+                        $id=$feature['properties']['HotspotMetaData']['id'];
+                        $name="";
+                        
+                        //get name
+                        $urld="https://core-jams-rdr.maps.yandex.net/description?id=".$id."&l=trje&lang=ru_RU&tm=$tm";
+                        $filed=@file($urld,FALSE,$context);
+                        $filed = json_decode($filed[0],TRUE,15);
+                        if ($filed) {
+                            $name = $filed['description']." ".$filed['startTime'];
+                        };
+                        
+                        //echo "DTP in point $lat,$lng $name \r\n";
+                        
+                        $el = $elsh;
+                        $el['_id']=$id;
+                        $el['_source']['location']['lat']=$lat;
+                        $el['_source']['location']['lon']=$lon;
+                        $el['_source']['text']=$name;
+                        $el['_source']['time']=time();
+                        //var_dump($el);
+                        $arr[]=$el;
+                    }
+                }
+            }
+	}
+    }
+    return $arr;
 }
 
 function convert_coords($x1,$y1,$x2,$y2) {
@@ -377,7 +473,9 @@ function get_quadr($quadr) {
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
     $quadrdata['hits']['total']=$result['hits']['total']['value'];
-    $quadrdata['items']=$items;
+    //$quadrdata['items']=$items;
+    $quadrdata['items']=array_merge($items,yandex_quadr($coords));
+    //$quadrdata['items']=yandex_quadr($coords);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
     return $quadrdata;
 }
