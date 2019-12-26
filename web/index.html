@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+	<script src="src/leaflet.geometryutil.js"></script>
 	
 <style>
 	body {
@@ -184,31 +185,6 @@
 <script>
 
 
-function geoToMercator (longitude, latitude) {
-	var Rn = 6378137, // Экваториальный радиус
-	e = 0.0818191908426 // Эксцентриситет
-	esinLat = e * Math.sin(latitude);
-    var tan_temp = Math.tan(Math.PI / 4.0 + latitude / 2.0),
-         pow_temp = Math.pow(Math.tan(Math.PI / 4.0 + Math.asin(esinLat) / 2), e),
-        U = tan_temp / pow_temp;
-
-    return [Rn * longitude, Rn * Math.log(U)];
-}
-
-
-function mercatorToPixels (p) {
-	var equatorLength = 40075016.685578488, //Длина экватора
-	worldSize = Math.pow(2, 31), // Размер мира в пикселах
-	a = worldSize / equatorLength,
-	b = equatorLength /2;
-    return new Point(
-        Math.round((this._b + p.x) * this._a),
-        Math.round((this._b - p.y) * this._a)
-    );
-}
-
-
-
 	var rsDebug=true
 
 	var rsLayers = new Object
@@ -219,10 +195,21 @@ function mercatorToPixels (p) {
 	var rsIcons = new Object();
 	enableLoading = false
 
-	$.ajaxSetup({
-		timeout:28000 // in milliseconds 
-	});
+	$.xhrPool = [];
+	$.xhrPool.abortAll = function() {
+		$(this).each(function(idx, jqXHR) {
+			jqXHR.abort();
+		});
+		//$.xhrPool = [];
+		$.xhrPool.length = 0
+		debug('Abort all loads');
+	};
 
+	$.ajaxSetup({
+		timeout:28000, // in milliseconds
+
+	});
+	
 	var mymap = L.map('mapid');
 	
 	if (Cookies.get('mapCenter')) {
@@ -504,6 +491,7 @@ function mercatorToPixels (p) {
 			  return false;
 			}
 	}
+
 	
 	function confirmObject(index, id, val) {
 	
@@ -538,47 +526,60 @@ function mercatorToPixels (p) {
 			delete rsLoadQuadrs[quadr]
 		}
 
-		$.getJSON('https://roadsituation.lisss.website/get.php?quadr='+quadr, function(data) {
-
-			quadr=data.quadr.id
-			debug('Loaded '+quadr)
-			if (rsLoadQuadrs[quadr]) {
-				delete rsLoadQuadrs[quadr]
-			}
-			//rsMarkers[quadr] = new Object
-			if (typeof(rsMarkers[quadr]) == 'undefined') {
-				rsMarkers[quadr] = new Object;
-			}
-			var rsNewMarkers = []
-			data.items.forEach(function(item) {
-				if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
-					link=urlString(item._source.source,' ')
-					addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
-					popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div lat='"+item._source.location.lat+"' lng='"+item._source.location.lon+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
-					newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
-					newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: link}}
-					rsMarkers[quadr][item._index+item._id] = newMarker
+		$.ajax({
+			url: 'https://roadsituation.lisss.website/get.php?quadr='+quadr,
+			dataType: 'json',
+			success: function(data) {
+				quadr=data.quadr.id
+				debug('Loaded '+quadr)
+				if (rsLoadQuadrs[quadr]) {
+					delete rsLoadQuadrs[quadr]
 				}
-				rsNewMarkers.push(''+item._index+item._id)
-			});
-			rsOldMarkers = Object.keys(rsMarkers[quadr])
-			rsOldMarkers.forEach(function(element) {
-				if (!rsNewMarkers.includes(element)) {
-					mymap.removeLayer(rsMarkers[quadr][element])
-					delete rsMarkers[quadr][element]
+				//rsMarkers[quadr] = new Object
+				if (typeof(rsMarkers[quadr]) == 'undefined') {
+					rsMarkers[quadr] = new Object;
 				}
-				showMarker(quadr,element)
-			})
-		}).always(function() {
-			rsLoads = Math.max(0,rsLoads-1)
-			if (rsLoads == 0) {
-				jQuery('.download-control').removeClass('download-now');
-				if (Object.keys(rsLoadQuadrs).length > 0) {
-					loadMarkers(true);
+				var rsNewMarkers = []
+				data.items.forEach(function(item) {
+					if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
+						link=urlString(item._source.source,' ')
+						addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
+						popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div lat='"+item._source.location.lat+"' lng='"+item._source.location.lon+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
+						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
+						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: link}}
+						rsMarkers[quadr][item._index+item._id] = newMarker
+					}
+					rsNewMarkers.push(''+item._index+item._id)
+				});
+				rsOldMarkers = Object.keys(rsMarkers[quadr])
+				rsOldMarkers.forEach(function(element) {
+					if (!rsNewMarkers.includes(element)) {
+						mymap.removeLayer(rsMarkers[quadr][element])
+						delete rsMarkers[quadr][element]
+					}
+					showMarker(quadr,element)
+				})
+			},
+			beforeSend: function(jqXHR) {
+				$.xhrPool.push(jqXHR);
+			},
+			complete: function(jqXHR) {
+				var index = $.xhrPool.indexOf(jqXHR);
+				if (index > -1) {
+					$.xhrPool.splice(index, 1);
 				}
+				rsLoads = Math.max(0,rsLoads-1)
+				debug(rsLoads+' (-)')
+				if (rsLoads == 0) {
+					jQuery('.download-control').removeClass('download-now');
+					if (Object.keys(rsLoadQuadrs).length > 0) {
+						loadMarkers(true);
+					}
+				}
+				loadMarkers(true);
 			}
-			debug(rsLoads+' (-)')
 		});
+
 	}
 	
 	function deleteQuadr(quadr) {
@@ -612,6 +613,7 @@ function mercatorToPixels (p) {
 	}
 	
 	function clearMap() {
+		$.xhrPool.abortAll();
 		$.each(rsLayers, function(id, item) {
 			item.clearLayers();
 		})
@@ -683,15 +685,17 @@ function mercatorToPixels (p) {
 			if (!rsNewLayers.includes(parseInt(element))) {
 				deleteQuadr(parseInt(element))
 			}
-		})
+		});
 		
+		rsLoadQuadrs = new Object;
 		rsNewLayers.forEach(function(element) {
 			if (!rsOldLayers.includes(''+element)) {
 				rsLoadQuadrs[element] = true;
 			}
-		})
-		
-		debug(Object.keys(rsMarkers))
+		});
+		debug(Object.keys(rsMarkers));
+		$.xhrPool.abortAll();
+		loadMarkers(true);
 		
 	}
 	
