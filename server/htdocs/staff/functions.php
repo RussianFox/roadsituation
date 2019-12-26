@@ -50,7 +50,7 @@ function yandex_quadr($coords) {
     $elsh = array('_index'=>'yandex','_score'=>1,'_type'=>'_doc','_source'=>$selsh);
 
     $tm=time();
-    $ZZ=14;
+    $ZZ=13;
 
     $yandexBox = yandexTile($coords['x1'],$coords['y1'],$coords['x2'],$coords['y2'],$ZZ);
 
@@ -99,6 +99,7 @@ function yandex_quadr($coords) {
                         $el['_source']['location']['lon']=$lon;
                         $el['_source']['text']=$name;
                         $el['_source']['time']=time();
+                        $el['_source']['layer']=$url;
                         //var_dump($el);
                         $arr[]=$el;
                     }
