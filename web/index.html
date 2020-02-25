@@ -45,11 +45,19 @@
 	.download-control {
 		width: 40px;
 		height: 30px;
+		line-height: 30px;
 		background-color: transparent;
+		color: transparent;
+		text-align: center;
+		font-weight:bold;
 	}
 
 	.download-now {
 		background-image: url('src/img/medium/download.gif');
+		background-size: 30px;
+		background-repeat: no-repeat;
+		background-position: center;
+		color:black;
 	}
 
 }
@@ -192,6 +200,7 @@
 	
 	var rsMarkers = new Object
 	var rsLoads = 0
+	var quadrCount = 0
 	var rsIcons = new Object();
 	enableLoading = false
 
@@ -220,7 +229,7 @@
 		mymap.setView([59.023,30.123], 13)
 	}
 
-	rsLayers['cam'] = L.layerGroup().addTo(mymap)
+	rsLayers['cam'] = L.layerGroup()
 	rsLayers['other'] = L.layerGroup().addTo(mymap)
 	rsLayers['maintenance'] = L.layerGroup().addTo(mymap)
 	rsLayers['block'] = L.layerGroup().addTo(mymap)
@@ -512,16 +521,23 @@
 		$(".confirm-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
 	}
 	
+	function updateProgress() {
+		qL = rsLoads+Object.keys(rsLoadQuadrs).length
+		jQuery('.download-control')[0].innerText = ''+Math.max(0,(Math.floor(100*((quadrCount-qL)/quadrCount))))+'%'
+		if (rsLoads>0) { 
+			jQuery('.download-control').addClass('download-now');
+		} else {
+			jQuery('.download-control').removeClass('download-now');
+		}
+	}
+	
 	function loadQuadr(quadr) {
 		if (rsLoads>20) {
 			return false;
 		}
 		rsLoads = rsLoads+1
 		debug(rsLoads+' (+)')
-		jQuery('.download-control').addClass('download-now');
-		if (rsMarkers[quadr] == undefined) {
-			rsMarkers[quadr] = new Object
-		}
+		updateProgress()
 		if (rsLoadQuadrs[quadr]) {
 			delete rsLoadQuadrs[quadr]
 		}
@@ -532,12 +548,12 @@
 			success: function(data) {
 				quadr=data.quadr.id
 				debug('Loaded '+quadr)
-				if (rsLoadQuadrs[quadr]) {
-					delete rsLoadQuadrs[quadr]
-				}
 				//rsMarkers[quadr] = new Object
 				if (typeof(rsMarkers[quadr]) == 'undefined') {
 					rsMarkers[quadr] = new Object;
+				}
+				if (rsLoadQuadrs[quadr]) {
+					delete rsLoadQuadrs[quadr]
 				}
 				var rsNewMarkers = []
 				data.items.forEach(function(item) {
@@ -548,6 +564,8 @@
 						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
 						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: link}}
 						rsMarkers[quadr][item._index+item._id] = newMarker
+					} else {
+						//тут надо обновить маркер
 					}
 					rsNewMarkers.push(''+item._index+item._id)
 				});
@@ -556,8 +574,9 @@
 					if (!rsNewMarkers.includes(element)) {
 						mymap.removeLayer(rsMarkers[quadr][element])
 						delete rsMarkers[quadr][element]
+					} else {
+						showMarker(quadr,element)
 					}
-					showMarker(quadr,element)
 				})
 			},
 			beforeSend: function(jqXHR) {
@@ -569,9 +588,9 @@
 					$.xhrPool.splice(index, 1);
 				}
 				rsLoads = Math.max(0,rsLoads-1)
+				updateProgress()
 				debug(rsLoads+' (-)')
 				if (rsLoads == 0) {
-					jQuery('.download-control').removeClass('download-now');
 					if (Object.keys(rsLoadQuadrs).length > 0) {
 						loadMarkers(true);
 					}
@@ -643,6 +662,10 @@
 	
 	function changeQuadrs(e) {
 	
+		rsLoadQuadrs = new Object;
+		$.xhrPool.abortAll();
+		rsLoadQuadrs = new Object;
+	
 		var bounds = mymap.getBounds();
 		bounds._northEast.lat;
 		bounds._northEast.lon;
@@ -662,6 +685,8 @@
 		qx2 = Math.floor(bounds._northEast.lng/xstep,-1)+1
 		qy1 = Math.floor((bounds._southWest.lat-ymin)/ystep,-1)+1
 		qy2 = Math.floor((bounds._northEast.lat-ymin)/ystep,-1)+1
+		
+		quadrCount = (qy2-qy1+1)*(qx2-qx1+1)
 		
 		var rsNewLayers = [];
 		for (var qyn=qy1 ; qyn <= qy2; qyn++) {
@@ -684,17 +709,16 @@
 		rsOldLayers.forEach(function(element) {
 			if (!rsNewLayers.includes(parseInt(element))) {
 				deleteQuadr(parseInt(element))
+				delete rsOldLayers[parseInt(element)]
 			}
 		});
 		
-		rsLoadQuadrs = new Object;
 		rsNewLayers.forEach(function(element) {
 			if (!rsOldLayers.includes(''+element)) {
 				rsLoadQuadrs[element] = true;
 			}
 		});
 		debug(Object.keys(rsMarkers));
-		$.xhrPool.abortAll();
 		loadMarkers(true);
 		
 	}
@@ -712,14 +736,16 @@
 		Cookies.set('mapCenter', mymap._lastCenter.lat+', '+mymap._lastCenter.lng+', '+mymap._zoom, { expires:365 });
 	}
 	
-	mymap.on('moveend', changeQuadrs);
-	mymap.on('dragend', function() {
+	//mymap.on('moveend', changeQuadrs);
+	mymap.on('moveend', function() {
+		debug('Map quadrs changes moveend');
 		saveMapPosition()
-		changeMap()
+		changeQuadrs()
 	});
 	mymap.on('zoomend', function() {
+		debug('Map quadrs changes zoomend');
 		saveMapPosition() 
-		changeMap()
+		changeQuadrs()
 	});
 	
 	changeQuadrs();
