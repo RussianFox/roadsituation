@@ -613,10 +613,12 @@
 	
 	function deleteQuadr(quadr) {
 		if (rsMarkers[quadr] != undefined) {
-			$.each(rsMarkers[quadr], function(id, item) {
+			var dQuadr = rsMarkers[quadr]
+			delete rsMarkers[quadr]
+			$.each(dQuadr, function(id, item) {
 				mymap.removeLayer(item);
 			})
-			delete rsMarkers[quadr]
+			delete dQuadr
 			debug('Deleted  '+quadr)
 		}
 	}
