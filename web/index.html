@@ -736,24 +736,26 @@
 		Cookies.set('mapCenter', mymap._lastCenter.lat+', '+mymap._lastCenter.lng+', '+mymap._zoom, { expires:365 });
 	}
 	
-	//mymap.on('moveend', changeQuadrs);
-	mymap.on('moveend', function() {
-		debug('Map quadrs changes moveend');
-		saveMapPosition()
-		changeQuadrs()
-	});
-	mymap.on('zoomend', function() {
-		debug('Map quadrs changes zoomend');
-		saveMapPosition() 
-		changeQuadrs()
-	});
-	
 	changeQuadrs();
 	loadMarkers();
 	
 	setInterval(function(){ loadMarkers(true); }, 1000);
 	setInterval(function(){ loadMarkers(false); }, 30000);
 	
+	$( document ).ready(function() {
+		mymap.on('moveend', function() {
+			debug('Map quadrs changes moveend');
+			saveMapPosition()
+			changeQuadrs()
+		});
+		mymap.on('zoomend', function() {
+			debug('Map quadrs changes zoomend');
+			saveMapPosition() 
+			changeQuadrs()
+		});
+		Debug( "Document ready" );
+	});
+
 	$( function() {
 
 	});
