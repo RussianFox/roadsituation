@@ -50,14 +50,19 @@
 		color: transparent;
 		text-align: center;
 		font-weight:bold;
+		background-size: 30px;
+		background-repeat: no-repeat;
+		background-position: center;
 	}
 
 	.download-now {
 		background-image: url('src/img/medium/download.gif');
-		background-size: 30px;
-		background-repeat: no-repeat;
-		background-position: center;
 		color:black;
+	}
+
+	.download-disabled {
+		background-image: url('src/img/medium/download-disabled.png') !important;
+		color:transparent !important;
 	}
 
 }
@@ -522,6 +527,11 @@
 	}
 	
 	function updateProgress() {
+		if (enableLoading == false) {
+			jQuery('.download-control').addClass('download-disabled');
+		} else {
+			jQuery('.download-control').removeClass('download-disabled');
+		}
 		qL = rsLoads+Object.keys(rsLoadQuadrs).length
 		jQuery('.download-control')[0].innerText = ''+Math.max(0,(Math.floor(100*((quadrCount-qL)/quadrCount))))+'%'
 		if (rsLoads>0) { 
@@ -687,6 +697,7 @@
 		qy2 = Math.floor((bounds._northEast.lat-ymin)/ystep,-1)+1
 		
 		quadrCount = (qy2-qy1+1)*(qx2-qx1+1)
+		updateProgress();
 		
 		var rsNewLayers = [];
 		for (var qyn=qy1 ; qyn <= qy2; qyn++) {
@@ -719,6 +730,7 @@
 			}
 		});
 		debug(Object.keys(rsMarkers));
+		
 		loadMarkers(true);
 		
 	}
@@ -753,7 +765,7 @@
 			saveMapPosition() 
 			changeQuadrs()
 		});
-		Debug( "Document ready" );
+		debug( "Document ready" );
 	});
 
 	$( function() {
