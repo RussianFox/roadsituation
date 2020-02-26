@@ -4,21 +4,35 @@ actions:
     action: reindex
     description: Reindex old temporary in one
     options:
-        ignore_empty_list: True
-        continue_if_exception: False
-        disable_action: False
-        request_body:
-            source:
-                index: REINDEX_SELECTION
-             dest:
-                index: old_roadsituation_temporary
+      disable_action: False
+      wait_interval: 9
+      max_wait: -1
+      request_body:
+        source:
+          index: REINDEX_SELECTION
+        dest:
+          index: old_roadsituation_temporary
     filters:
-      - filtertype: pattern
-        kind: prefix
-        value: roadsituation_temporary
-      - filtertype: age
-        source: name
-        direction: older
-        timestring: '%Y-%m-%d-%H-%i'
-        unit: hours
-        unit_count: 1
+     - filtertype: pattern
+       kind: prefix
+       value: roadsituation_temporary
+     - filtertype: age
+       source: creation_date
+       direction: older
+       unit: hours
+       unit_count: 1
+  2:
+    action: delete_indices
+    description: Delete old temporary indices
+    options:
+      disable_action: False
+      continue_if_exception: False
+    filters:
+     - filtertype: pattern
+       kind: prefix
+       value: roadsituation_temporary
+     - filtertype: age
+       source: creation_date
+       direction: older
+       unit: hours
+       unit_count: 1
