@@ -200,6 +200,13 @@
 
 	var rsDebug=true
 
+	$.getScript( "settings.js", function( data, textStatus, jqxhr ) {
+		console.log( data ); // Data returned
+		console.log( textStatus ); // Success
+		console.log( jqxhr.status ); // 200
+		console.log( "Load was performed." );
+	});
+
 	var rsLayers = new Object
 	var rsLoadQuadrs = new Object
 	
