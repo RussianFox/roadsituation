@@ -65,6 +65,10 @@
 		color:transparent !important;
 	}
 
+	.ui-dialog {
+		z-index:9999;
+	}
+
 }
 </style>
 	
@@ -737,6 +741,13 @@
 		
 	}
 	
+	function firstRun() {
+		if (!Cookies.get('notFirstRun')) {
+			$('<div>...</div>').load('firstrun.html').css('zIndex',9999).dialog({width: "90%", title: "First run"});
+		}
+		Cookies.set('notFirstRun', 1, { expires:365 });
+	}
+	
 	function changeMap() {
 		for(var quadr in rsMarkers) {
 			for(var element in rsMarkers[quadr]) {
@@ -768,6 +779,7 @@
 			changeQuadrs()
 		});
 		debug( "Document ready" );
+		firstRun();
 	});
 
 	$( function() {
