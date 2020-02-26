@@ -177,12 +177,11 @@ function vote_object($index,$id,$vote) {
     		    'confirm' => 1
     		]
     	    ]
-	];
+		];
 
-	$result = $client->update($params);
-	return;
+		$result = $client->update($params);
+		return;
     }
-
     if ($val==-1) {
         $params = [
 		'index' => $index,
@@ -199,12 +198,11 @@ function vote_object($index,$id,$vote) {
     		    'discard' => 1
     		]
     	    ]
-	];
+		];
 
-	$result = $client->update($params);
-	return;
+		$result = $client->update($params);
+		return;
     }
-
     add_error("Wrong vote");
 }
 
@@ -451,32 +449,30 @@ function get_quadr($quadr) {
     
     do {
         $params['index'] = 'roadsituation*';
-	$params['size'] = 100;
-	$params['from'] = $iloaded;
+		$params['size'] = 100;
+		$params['from'] = $iloaded;
         $params['body']['query']['geo_bounding_box']['location'] =
 		[
 		    'top_left'=>[
-			'lat'=>$coords['y2'],
-			'lon'=>$coords['x1']
+				'lat'=>$coords['y2'],
+				'lon'=>$coords['x1']
 		    ],
 		    'bottom_right'=>[
-			'lat'=>$coords['y1'],
-			'lon'=>$coords['x2']
+				'lat'=>$coords['y1'],
+				'lon'=>$coords['x2']
 		    ]
 		];
-	$result = $client->search($params);
-	$items = array_merge($items,$result['hits']['hits']);
-	$iloaded=count($items);
-	$iall = $iloaded;
-	$iall = 1*$result['hits']['total']['value'];
+		$result = $client->search($params);
+		$items = array_merge($items,$result['hits']['hits']);
+		$iloaded=count($items);
+		$iall = $iloaded;
+		$iall = 1*$result['hits']['total']['value'];
     } while ($iloaded<$iall);
     $quadrdata=[];
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
     $quadrdata['hits']['total']=$result['hits']['total']['value'];
-    //$quadrdata['items']=$items;
     $quadrdata['items']=array_merge($items,yandex_quadr($coords));
-    //$quadrdata['items']=yandex_quadr($coords);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
     return $quadrdata;
 }
