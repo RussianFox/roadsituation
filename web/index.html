@@ -82,7 +82,10 @@
 		border: 2px solid rgba(0,0,0,0.2);
 		background-clip: padding-box;
 		border-radius: 4px;
-		
+	}
+	
+	.disprove-button, .confirm-button {
+		margin-left: 5px;
 	}
 
 }
@@ -559,7 +562,7 @@
 			debug(data)
 			userMessage( "Add object success" );
 		  })
-		  .fail(function() {
+		  .fail(function( data ) {
 			debug(data)
 			userError( "Add object failed" );
 		  });
@@ -569,10 +572,10 @@
 		var mFeature = e.popup._source.feature.properties
 		var link=urlString(mFeature.link,' ')
 		var addition = parseTypesObj(mFeature.type)+' '+parseAdditions(mFeature.addition)
-		popupText="<img style='max-width: 25px;' src='src/img/medium/"+mFeature.type+".png'> "+ParseData(mFeature.time)+" <br />"+addition +" <p><b>"+mFeature.text+"</b></p> <div lat='"+e.popup._source._latlng.lat+"' lng='"+e.popup._source._latlng.lng+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
+		popupText="<img style='max-width: 25px;' src='src/img/medium/"+mFeature.type+".png'> "+ParseData(mFeature.time)+" <br />"+addition +" <p><b>"+mFeature.text+"</b></p> <div lat='"+e.popup._source._latlng.lat+"' lng='"+e.popup._source._latlng.lng+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'><div class='confirm-button'>Confirm("+mFeature.confirm_count+")</div><div class='disprove-button'>Discard("+mFeature.discard_count+")</div></div> <div style='text-align:right'>"+link+"</div>"
 		e.popup.setContent(popupText)
-		$(".disprove-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, -1); mymap.closePopup()});
-		$(".confirm-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
+		$(".disprove-button").button({icon: "ui-icon-circle-close",showLabel: false}).click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, -1); mymap.closePopup()});
+		$(".confirm-button").button({icon: "ui-icon-circle-check",showLabel: false}).click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
 	}
 	
 	function updateProgress() {
@@ -622,11 +625,11 @@
 					if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
 						//newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
 						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup('').on('popupopen', objectPopup)
-						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition}}
+						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.confirm}}
 						rsMarkers[quadr][item._index+item._id] = newMarker
 					} else {
 						//тут надо обновить маркер
-						rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition}}
+						rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.confirm}}
 						rsMarkers[quadr][item._index+item._id].setLatLng(new L.LatLng(item._source.location.lat, item._source.location.lon));
 					}
 					rsNewMarkers.push(''+item._index+item._id)
