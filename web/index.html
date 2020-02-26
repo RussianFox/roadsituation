@@ -343,12 +343,20 @@
 			.delay(2000).queue(function() { $(this).remove(); });
 	}
 
+	function fix_url(e) {
+		if (!e.match(/^[a-zA-Z]+:\/\//))
+		{
+			return 'http://' + e;
+		}
+		return e;
+	}
+
 	function urlString(str,delim) {
 		rstr=''
 		strs = str.split(';')
 		strs.forEach(function(e) {
 			if (is_url(e)) {
-				rstr=rstr+delim+'<a class=source_link target=_blank href="'+e+'">'+e+'</a>'
+				rstr=rstr+delim+'<a class=source_link target=_blank href="'+fix_url(e)+'">'+e+'</a>'
 			} else {
 				rstr=rstr+delim+e
 			}
@@ -558,7 +566,11 @@
 	}
 	
 	function objectPopup(e) {
-		
+		var mFeature = e.popup._source.feature.properties
+		var link=urlString(mFeature.link,' ')
+		var addition = parseTypesObj(mFeature.type)+' '+parseAdditions(mFeature.addition)
+		popupText="<img style='max-width: 25px;' src='src/img/medium/"+mFeature.type+".png'> "+ParseData(mFeature.time)+" <br />"+addition +" <p><b>"+mFeature.text+"</b></p> <div lat='"+e.popup._source._latlng.lat+"' lng='"+e.popup._source._latlng.lng+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
+		e.popup.setContent(popupText)
 		$(".disprove-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, -1); mymap.closePopup()});
 		$(".confirm-button").click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
 	}
@@ -604,15 +616,18 @@
 				}
 				var rsNewMarkers = []
 				data.items.forEach(function(item) {
+					//link=urlString(item._source.source,' ')
+					//addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
+					//popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div lat='"+item._source.location.lat+"' lng='"+item._source.location.lon+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
 					if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
-						link=urlString(item._source.source,' ')
-						addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
-						popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div lat='"+item._source.location.lat+"' lng='"+item._source.location.lon+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
-						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
-						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: link}}
+						//newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
+						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup('').on('popupopen', objectPopup)
+						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition}}
 						rsMarkers[quadr][item._index+item._id] = newMarker
 					} else {
 						//тут надо обновить маркер
+						rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition}}
+						rsMarkers[quadr][item._index+item._id].setLatLng(new L.LatLng(item._source.location.lat, item._source.location.lon));
 					}
 					rsNewMarkers.push(''+item._index+item._id)
 				});
