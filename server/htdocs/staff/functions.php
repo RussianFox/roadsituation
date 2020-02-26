@@ -210,11 +210,11 @@ function vote_object($index,$id,$vote) {
 
 function check_object_type($type) {
     global $object_perm_types,$object_temp_types;
-    if (!in_array($type,$object_perm_types)) {
-	return 'permament';
+    if (in_array($type,$object_perm_types)) {
+		return 'permanent';
     };
-    if (!in_array($type,$object_temp_types)) {
-	return 'temporary';
+    if (in_array($type,$object_temp_types)) {
+		return 'temporary';
     };
     return false;
 }
@@ -224,7 +224,7 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
 
     $index_type = check_object_type($type);
     if (!$index_type) {
-	add_error("Wrong type");
+		add_error("Wrong type");
     };
 
     $date = new DateTime("now", new DateTimeZone("UTC"));
@@ -237,8 +237,8 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
     	    'time' => time(),
     	    'type' => $type,
 	    'location' => [
-		'lat' => $lat,
-		'lon' => $lng
+			'lat' => $lat,
+			'lon' => $lng
 	    ],
 	    'addition' => $addition,
 	    'source' => $source,
