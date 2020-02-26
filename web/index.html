@@ -743,7 +743,13 @@
 	
 	function firstRun() {
 		if (!Cookies.get('notFirstRun')) {
-			$('<div>...</div>').load('firstrun.html').css('zIndex',9999).dialog({width: "90%", title: "First run"});
+			$( "<div id=firstRunDiv></div>" ).dialog({
+			   autoOpen: false, width: "90%", title: "First run", create: function(event, ui) {
+				 $(this).load('firstrun.html', function() {
+				   $(this).dialog('open')
+				 });
+			   }
+			});
 		}
 		Cookies.set('notFirstRun', 1, { expires:365 });
 	}
