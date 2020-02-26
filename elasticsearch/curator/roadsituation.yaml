@@ -1,12 +1,17 @@
 ---
 actions:
   1:
-    action: delete_indices
-    description: DELETE OLD USER INDICIES
+    action: reindex
+    description: Reindex old temporary in one
     options:
-      ignore_empty_list: True
-      continue_if_exception: False
-      disable_action: False
+        ignore_empty_list: True
+        continue_if_exception: False
+        disable_action: False
+        request_body:
+            source:
+                index: REINDEX_SELECTION
+             dest:
+                index: old_roadsituation_temporary
     filters:
       - filtertype: pattern
         kind: prefix
@@ -14,6 +19,6 @@ actions:
       - filtertype: age
         source: name
         direction: older
-        timestring: '%Y-%m-%d-%H'
+        timestring: '%Y-%m-%d-%H-%i'
         unit: hours
-        unit_count: 2
+        unit_count: 1

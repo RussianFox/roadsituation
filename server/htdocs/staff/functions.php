@@ -228,7 +228,7 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
     };
 
     $date = new DateTime("now", new DateTimeZone("UTC"));
-    $index="roadsituation_".$index_type."_".($index_type=='temporary'?$date->format('Y-m-d-H'):$date->format('Y-m-d'));
+    $index="roadsituation_".$index_type."_".($index_type=='temporary'?$date->format('Y-m-d-H-i'):$date->format('Y-m-d'));
 
 
     $params = [
