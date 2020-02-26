@@ -745,7 +745,7 @@
 		if (!Cookies.get('notFirstRun')) {
 			$( "<div id=firstRunDiv></div>" ).dialog({
 			   autoOpen: false, width: "90%", title: "First run", create: function(event, ui) {
-				 $(this).load('firstrun.html', function() {
+				 $('#firstRunDiv').load('firstrun.html', function() {
 				   $(this).dialog('open')
 				 });
 			   }
