@@ -70,17 +70,19 @@
 	}
 
 	.help-button {
-		width: 24px;
-		height: 24px;
+		width: 30px;
+		height: 30px;
 		cursor: pointer;
 		font-weight:bold;
+		font-size:22px;
 		color:red;
 		text-align: center;
-		line-height: 24px;
+		line-height: 30px;
 		background-color: white;
-		border: 1px solid rgba(0,0,0,0.2);
+		border: 2px solid rgba(0,0,0,0.2);
 		background-clip: padding-box;
-		border-radius: 3px;
+		border-radius: 4px;
+		
 	}
 
 }
@@ -305,7 +307,7 @@
 
 	var helpControl = L.Control.extend({
 	  options: {
-		position: 'bottomleft' 
+		position: 'topleft' 
 	  },
 	  onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'help-button');
