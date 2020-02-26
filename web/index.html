@@ -560,11 +560,11 @@
 		$.post( "set.php", { confirm: '', index: index, id: id, val: val})
 		  .done(function( data ) {
 			debug(data)
-			userMessage( "Add object success" );
+			userMessage( "Voted object success" );
 		  })
 		  .fail(function( data ) {
 			debug(data)
-			userError( "Add object failed" );
+			userError( "Voted object failed" );
 		  });
 	}
 	
@@ -625,11 +625,11 @@
 					if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
 						//newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
 						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup('').on('popupopen', objectPopup)
-						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.confirm}}
+						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.discard}}
 						rsMarkers[quadr][item._index+item._id] = newMarker
 					} else {
 						//тут надо обновить маркер
-						rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.confirm}}
+						rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.discard}}
 						rsMarkers[quadr][item._index+item._id].setLatLng(new L.LatLng(item._source.location.lat, item._source.location.lon));
 					}
 					rsNewMarkers.push(''+item._index+item._id)
