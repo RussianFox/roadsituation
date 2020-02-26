@@ -69,6 +69,20 @@
 		z-index:9999;
 	}
 
+	.help-button {
+		width: 24px;
+		height: 24px;
+		cursor: pointer;
+		font-weight:bold;
+		color:red;
+		text-align: center;
+		line-height: 24px;
+		background-color: white;
+		border: 1px solid rgba(0,0,0,0.2);
+		background-clip: padding-box;
+		border-radius: 3px;
+	}
+
 }
 </style>
 	
@@ -288,6 +302,23 @@
 	});
 
 	mymap.addControl(new downloadControl());
+
+	var helpControl = L.Control.extend({
+	  options: {
+		position: 'bottomleft' 
+	  },
+	  onAdd: function (map) {
+		var container = L.DomUtil.create('div', 'help-button');
+		container.innerHTML='?'
+		L.DomEvent
+		    .addListener(container, 'click', L.DomEvent.stopPropagation)
+            .addListener(container, 'click', L.DomEvent.preventDefault)
+			.addListener(container, 'click', function () { firstRun(true); });
+		return container;
+	  }
+	});
+
+	mymap.addControl(new helpControl());
 
 	popupContent = $('#tabs')[0].innerHTML
 	var popup = L.popup({ maxWidth: 325, closeOnClick: false, autoClose: false, closeButton: false}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
@@ -741,10 +772,12 @@
 		
 	}
 	
-	function firstRun() {
-		if (!Cookies.get('notFirstRun')) {
+	function firstRun(forceOpen=false) {
+		if ( (!Cookies.get('notFirstRun')) | (forceOpen) ) {
+			var titleHelp = "First run"
+			if (forceOpen) {titleHelp = "Help"};
 			$( "<div id=firstRunDiv></div>" ).dialog({
-			   autoOpen: false, width: "90%", title: "First run", create: function(event, ui) {
+			   autoOpen: false, width: "90%", title: titleHelp, create: function(event, ui) {
 				 $('#firstRunDiv').load('firstrun.html', function() {
 				   $(this).dialog('open')
 				 });
