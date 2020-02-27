@@ -40,7 +40,6 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
     ));
 
     $url = "https://transport.mos.ru/ajax/transport/";
-    print_r($url);
     echo "Start loading: $url ..... \r\n";
     $matches=false;
     $file=false;
@@ -82,7 +81,9 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 			$ids[] = $object_id;
 		}
 		
+		echo "Objects loading succes. Start cleaning. \r\n";
 		clean_objects($index,'must_not',$ids);
+		echo "Cleaning finished \r\n";
 		replace_index_alias($index,"roadsituation_transportmos");
     } else {
 		echo "failed \r\n";
