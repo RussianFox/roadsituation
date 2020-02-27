@@ -58,12 +58,12 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 		
 		foreach ($file['features'] as $feature) {
 		
-			$object_id=$feature['options']['object_id'];
+			$object_id=$feature['id'];
 			if (strpos($object_id,'_')) {
 				continue;
 			};
 			$type="block";
-			$name=$feature['properties']['hintContent']." Type:".$feature['options']['type']." Color: ".$feature['options']['iconColor'].", ".$feature['options']['strokeColor'][0].", ".$feature['options']['strokeColor'][1];
+			//$name=$feature['properties']['hintContent']." Type:".$feature['options']['type']." Color: ".$feature['options']['iconColor'].", ".$feature['options']['strokeColor'][0].", ".$feature['options']['strokeColor'][1];
 			$name=$feature['properties']['hintContent'];
 			
 			$kk = array_search($name,$matches[2]);
