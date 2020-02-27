@@ -56,7 +56,7 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 		$html=@file_get_contents("https://transport.mos.ru/mostrans/closures");
 		$list = preg_match_all('/<li id="closure_id_.*<span class="sp1">(.*)<\/span>.*<span class="sp2">(.*)<\/span>.*class="moreInfo_block">(.*)<\/div>.*<\/li>/sUsi',$html,$matches);
 		
-		foreach ($file['json']['features'] as $feature) {
+		foreach ($file['features'] as $feature) {
 		
 			$object_id=$feature['options']['object_id'];
 			if (strpos($object_id,'_')) {
