@@ -179,8 +179,12 @@ function vote_object($index,$id,$vote) {
     	    ]
 		];
 
-		$result = $client->update($params);
-		return;
+		try {
+			$result = $client->update($params);
+			return true;
+		} catch (Exception $e)  {
+			return false;
+		}
     }
     if ($val==-1) {
         $params = [
@@ -188,20 +192,25 @@ function vote_object($index,$id,$vote) {
     	    'id'    => $id,
     	    'type' => '_doc',
     	    'body'  => [
-    		'script' => [
-        	    'source' => 'ctx._source.discard += params.count',
-        	    'params' => [
-        		'count' => 1
-        	    ],
-    		],
-    		'upsert' => [
-    		    'discard' => 1
-    		]
+				'script' => [
+					'source' => 'ctx._source.discard += params.count',
+					'params' => [
+						'count' => 1
+					],
+				],
+				'upsert' => [
+					'discard' => 1
+				]
     	    ]
 		];
-
-		$result = $client->update($params);
-		return;
+		
+		try {
+			$result = $client->update($params);
+			return true;
+		} catch (Exception $e)  {
+			return false;
+		}
+		
     }
     add_error("Wrong vote");
 }
@@ -228,38 +237,44 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
     $date = new DateTime("now", new DateTimeZone("UTC"));
     $index="roadsituation_".$index_type."_".($index_type=='temporary'?$date->format('Y-m-d-H-i'):$date->format('Y-m-d'));
 
+	$geometry = array('type'=>"Point","coordinates"=>Array($lng,$lat));
 
     $params = [
 	'index' => $index,
         'body' => [
     	    'time' => time(),
     	    'type' => $type,
-	    'location' => [
-			'lat' => $lat,
-			'lon' => $lng
-	    ],
-	    'addition' => $addition,
-	    'source' => $source,
-	    'text' => $text,
-	    'confirm' => 0,
-	    'discard' => 0
+			'location' => [
+				'lat' => $lat,
+				'lon' => $lng
+			],
+			'geometry' => $geometry,
+			'addition' => $addition,
+			'source' => $source,
+			'text' => $text,
+			'confirm' => 0,
+			'discard' => 0
     	]
     ];
-
     
-    $result = $client->index($params);
+    try {
+        $result = $client->index($params);
+		return true;
+    } catch (Exception $e)  {
+		return false;
+    }
 }
 
 function center_line($coordinates) {
 
     $lenght=-1;
     foreach($coordinates as $coord) {
-	if ($lenght<0) {
-    	    $lenght=0;
-	} else {
-	    $lenght=$lenght+sqrt(pow($coord['lat']-$tcoord['lat'],2)+pow($coord['lng']-$tcoord['lng'],2));
-	};
-	$tcoord=$coord;
+		if ($lenght<0) {
+				$lenght=0;
+		} else {
+				$lenght=$lenght+sqrt(pow($coord['lat']-$tcoord['lat'],2)+pow($coord['lng']-$tcoord['lng'],2));
+		};
+		$tcoord=$coord;
     };
     $tlenght = $lenght/2;
     $lenght=-1;
@@ -277,9 +292,9 @@ function center_line($coordinates) {
         $tcoord=$coord;
     };
     if (count($coordinates)>0) {
-	if ($coordinates[0]['lat'] && $coordinates[0]['lng']) {
-	    return array('lat'=>1*$coordinates[0]['lat'], 'lng'=>1*$coordinates[0]['lng']);
-	}
+		if ($coordinates[0]['lat'] && $coordinates[0]['lng']) {
+			return array('lat'=>1*$coordinates[0]['lat'], 'lng'=>1*$coordinates[0]['lng']);
+		}
     }
     return false;
 };
@@ -320,10 +335,10 @@ function replace_index_alias($index, $alias) {
     );
 
     try {
-	$result = $client->indices()->updateAliases($params);
-	return true;
+		$result = $client->indices()->updateAliases($params);
+		return true;
     } catch (Exception $e)  {
-	return false;
+		return false;
     }
     
 }
@@ -363,20 +378,23 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 	add_error("Wrong type");
     };
 
+	$geometry = array('type'=>"Point","coordinates"=>Array($lng,$lat));
+
     $params = [
 	'index' => $index,
         'body' => [
     	    'time' => time(),
     	    'type' => $type,
-	    'location' => [
-		'lat' => $lat,
-		'lon' => $lng
-	    ],
-	    'addition' => $addition,
-	    'source' => $source,
-	    'text' => $text,
-	    'confirm' => 0,
-	    'discard' => 0
+			'location' => [
+				'lat' => $lat,
+				'lon' => $lng
+			],
+			'geometry' => $geometry,
+			'addition' => $addition,
+			'source' => $source,
+			'text' => $text,
+			'confirm' => 0,
+			'discard' => 0
     	]
     ];
 
@@ -397,8 +415,12 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
 
     $index_type = check_object_type($type);
     if (!$index_type) {
-	add_error("Wrong type");
+		add_error("Wrong type");
     };
+	
+	if (!$geometry) {
+		$geometry = array('type'=>"Point","coordinates"=>Array($lng,$lat));
+	};
 
     $params = [
     	'index' => $index,
@@ -431,9 +453,9 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
 
     try {
         $result = $client->update($params);
-	return true;
+		return true;
     } catch (Exception $e)  {
-	return false;
+		return false;
     }
 }
 
