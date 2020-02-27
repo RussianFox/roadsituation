@@ -45,7 +45,7 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 	$rc=10;
 	$file=false;
 	while (($rc>0) and (!$file)) {
-		echo "Trying...";
+		echo "Trying...\r\n";
 		$file=@file_get_contents($url,null,$context);
 		$rc--;
 	}
