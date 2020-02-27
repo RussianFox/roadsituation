@@ -448,27 +448,27 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
     	'id'    => $id,
     	'body'  => [
     		'doc' => [
-			'location' => [
-			    'lat' => 1*$lat,
-			    'lon' => 1*$lng
-			],
-			'addition' => $addition,
-			'geometry' => $geometry,
-			'text' => $text
+				'location' => [
+					'lat' => 1*$lat,
+					'lon' => 1*$lng
+				],
+				'addition' => $addition,
+				'geometry' => $geometry,
+				'text' => $text
     		],
     		'upsert' => [
-		    'time' => time(),
+				'time' => time(),
     		    'type' => $type,
-		    'location' => [
-			'lat' => 1*$lat,
-			'lon' => 1*$lng
-		    ],
-		    'geometry' => $geometry,
-		    'addition' => $addition,
-		    'source' => $source,
-		    'text' => $text,
-		    'confirm' => 0,
-		    'discard' => 0
+				'location' => [
+					'lat' => 1*$lat,
+					'lon' => 1*$lng
+				],
+				'geometry' => $geometry,
+				'addition' => $addition,
+				'source' => $source,
+				'text' => $text,
+				'confirm' => 0,
+				'discard' => 0
     		]
         ]
     ];
