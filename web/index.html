@@ -111,6 +111,11 @@
 		margin-inline-end: 0px;
 		font-weight: bold;
 	}
+	
+	#debugConsole {
+		background-color: #ff50504d;
+		padding: 1em;
+	}
 }
 </style>
 	
@@ -347,6 +352,20 @@
 	});
 
 	mymap.addControl(new helpControl());
+
+	var debugControl = L.Control.extend({
+	  options: {
+		position: 'bottomleft' 
+	  },
+	  onAdd: function (map) {
+		var container = L.DomUtil.create('div', 'debug_control');
+		container.innerHTML='<div id=debugConsole></div>'
+		L.DomEvent
+		    .addListener(container, 'click', L.DomEvent.stopPropagation)
+            .addListener(container, 'click', L.DomEvent.preventDefault)
+		return container;
+	  }
+	});
 
 	popupContent = $('#tabs')[0].innerHTML
 	var popup = L.popup({ maxWidth: 325, closeOnClick: false, autoClose: false, closeButton: false}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
@@ -601,6 +620,30 @@
 		$(".confirm-button").button({icon: "ui-icon-circle-check",showLabel: false}).click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
 	}
 	
+	function debugConsole() {
+		if ( $( "#debugConsole" ).length ) {
+			textD=""
+			textD=textD+"Quadrs on map: "+quadrCount+" "
+			textD=textD+"Quadrs in load: "+rsLoads+" "
+			textD=textD+"Quadrs in quenue: "+Object.keys(rsLoadQuadrs).length+" "
+			textD=textD+"<br>Loading is "+(enableLoading?'enabled':'disabled')+" "
+			var mc = 0;
+			var mcc = 0;
+			$.each(rsMarkers, function(id, item) {
+				mc=mc+Object.keys(item).length
+			})
+			textD=textD+"Elements on quadrs: "+mc+" "
+			
+			$.each(rsLayers, function(id, item) {
+				if (item._mapToAdd) {
+					mcc=mcc+Object.keys(item._layers).length
+				}
+			})
+			textD=textD+"Elements on map: "+mcc+" "
+			$( "#debugConsole" )[0].innerHTML=textD
+		}
+	}
+	
 	function updateProgress() {
 		if (enableLoading == false) {
 			jQuery('.download-control').addClass('download-disabled');
@@ -614,6 +657,9 @@
 		} else {
 			jQuery('.download-control').removeClass('download-now');
 		}
+		
+		debugConsole();
+		
 	}
 	
 	function loadQuadr(quadr) {
@@ -740,10 +786,13 @@
 				if (!enableLoading) {
 					mymap.removeLayer(marker);
 				} else {
-					if (inMap(marker._latlng.lat, marker._latlng.lng)) {
+					//if (inMap(marker._latlng.lat, marker._latlng.lng)) {
+					//	rsLayers[marker.feature.properties.type].addLayer(marker);
+					//} else {
+					//	mymap.removeLayer(marker);
+					//}
+					if (!marker._leaflet_id) {
 						rsLayers[marker.feature.properties.type].addLayer(marker);
-					} else {
-						mymap.removeLayer(marker);
 					}
 				}
 			}
@@ -850,7 +899,11 @@
 	setInterval(function(){ loadMarkers(false); }, 30000);
 	
 	$( document ).ready(function() {
-		$.getScript( "settings.js");
+		$.getScript( "settings.js").always(function() { 
+			if (rsDebug) {
+				mymap.addControl(new debugControl());
+			}
+		});
 		mymap.on('moveend', function() {
 			debug('Map quadrs changes moveend');
 			saveMapPosition()
@@ -860,6 +913,8 @@
 			debug('Map quadrs changes zoomend');
 			changeQuadrs()
 		});
+		mymap.on('overlayadd', updateProgress);
+		mymap.on('overlayremove', updateProgress);
 		debug( "Document ready" );
 		firstRun();
 	});
