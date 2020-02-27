@@ -40,10 +40,15 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
     ));
 
     $url = "https://transport.mos.ru/ajax/transport/";
-    echo "Start loading: $url ..... \r\n";
+    echo "Start loading: $url \r\n";
     $matches=false;
-    $file=false;
-    $file=@file_get_contents($url,null,$context);
+	$rc=10;
+	$file=false;
+	while (($rc>0) and (!$file)) {
+		echo "Trying...";
+		$file=@file_get_contents($url,null,$context);
+		$rc--;
+	}
     if ($file) {
 		echo "loaded \r\n";
 		$file = json_decode($file, true);
