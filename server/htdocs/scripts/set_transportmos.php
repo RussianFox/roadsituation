@@ -2,6 +2,11 @@
 
 include '../staff/functions.php';
 
+//$rt = array(array(15,68),array(43,92));
+//print_r($rt);
+//print_r(rollCoordinates($rt));
+//exit;
+
 function numberFormat($digit, $width) {
     while(strlen($digit) < $width)
           $digit = '0' . $digit;
@@ -74,7 +79,9 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 			
 			$link="https://transport.mos.ru/";
 			$coordinates=array();
-			foreach ($feature['geometry']['coordinates'] as $coordinate) {
+			$geometry = $feature['geometry'];
+			$geometry['coordinates']=rollCoordinates($geometry['coordinates']);
+			foreach ($geometry['coordinates'] as $coordinate) {
 				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
 			};
 			$center = center_line($coordinates);
@@ -83,12 +90,12 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 			} else {
 				$type="maintenance";
 			}
-			update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$feature['geometry']);
+			update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
 			$ids[] = $object_id;
 		}
 		
 		echo "Objects loading succes. Start cleaning. \r\n";
-		clean_objects($index,'must_not',$ids);
+		//clean_objects($index,'must_not',$ids);
 		echo "Cleaning finished \r\n";
 		replace_index_alias($index,"roadsituation_transportmos");
     } else {

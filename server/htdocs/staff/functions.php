@@ -29,6 +29,27 @@ function correct_coords($x,$min,$max) {
     return $xn;
 }
 
+function rollCoordinates($geometry) {
+	if (is_array($geometry)) {
+		if (count($geometry)==2) {
+			if ((array_key_exists(0,$geometry)) and (array_key_exists(1,$geometry))) {
+				if ((is_numeric($geometry[0])) and (is_numeric($geometry[1]))) {
+					$cn=$geometry[0];
+					$geometry[0]=$geometry[1];
+					$geometry[1]=$cn;
+					return $geometry;
+				}
+			}
+		};
+		foreach ($geometry as &$geom) {
+			$geom = rollCoordinates($geom);
+		}
+		return $geometry;
+	} else {
+		return false;
+	}
+}
+
 function point_in_coords($point,$coords) {
 
     if (( $point['lon']<min($coords['x1'],$coords['x2']) ) or ( $point['lon']>max($coords['x1'],$coords['x2']) ))  {
@@ -432,6 +453,7 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
 			    'lon' => 1*$lng
 			],
 			'addition' => $addition,
+			'geometry' => $geometry,
 			'text' => $text
     		],
     		'upsert' => [
