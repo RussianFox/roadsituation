@@ -40,6 +40,7 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
     ));
 
     $url = "https://transport.mos.ru/ajax/transport/";
+	$url = "https://transport.mos.ru/map/get?action=get_coords&type=road_closures";
     echo "Start loading: $url \r\n";
     $matches=false;
 	$rc=10;
@@ -52,7 +53,7 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
     if ($file) {
 		echo "loaded \r\n";
 		$file = json_decode($file, true);
-		$html=$file['html'];
+		$html=@file_get_contents("https://transport.mos.ru/mostrans/closures");
 		$list = preg_match_all('/<li id="closure_id_.*<span class="sp1">(.*)<\/span>.*<span class="sp2">(.*)<\/span>.*class="moreInfo_block">(.*)<\/div>.*<\/li>/sUsi',$html,$matches);
 		
 		foreach ($file['json']['features'] as $feature) {
