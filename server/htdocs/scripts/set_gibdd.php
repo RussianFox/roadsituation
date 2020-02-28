@@ -20,6 +20,9 @@ if (!$bool) {
     $response = $client->indices()->create($params);
 }
 
+$query = $client->count(['index' => $index]);
+$docsCount_start=1*$query['count'];
+
 $need_clean=true;
 $ids=array();
 for ($ii=1;$ii<96;$ii++) {
@@ -65,15 +68,22 @@ for ($ii=1;$ii<96;$ii++) {
     }
 }
 
+$query = $client->count(['index' => $index]);
+$docsCount_add=1*$query['count'];
+$docsCount_clean=$docsCount_add;
+
 if ($need_clean) {
     echo "Starting cleaning...\r\n";
     clean_objects($index,'must_not',$ids);
 } else {
 	echo "Cleaning canceled, we have broken regions \r\n";
 };
+$query = $client->count(['index' => $index]);
+$docsCount_clean=1*$query['count'];
 
 replace_index_alias($index,"roadsituation_gibdd");
 
+echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
 echo "Finish ".date('Y-m-d H:i:s')."\r\n";
 echo "----------------------------------------\r\n";
 ?>
