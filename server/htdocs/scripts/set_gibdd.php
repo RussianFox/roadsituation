@@ -16,6 +16,7 @@ $index="gibdd";
 $params = ['index' => $index];
 $bool=$client->indices()->exists($params);
 if (!$bool) {
+	echo "Index is not exist, creating it \r\n";
     $response = $client->indices()->create($params);
 }
 
@@ -26,7 +27,7 @@ for ($ii=1;$ii<96;$ii++) {
     if (in_array($ii,$ex_regs)) { continue; };
 
     $url = "https://xn--90adear.xn--p1ai/r/".numberFormat($ii, 2)."/milestones/";
-    echo "Region $ii\n";
+    echo "Region $ii \r\n";
 
     $file=false;
     $need_continue=5;
@@ -44,32 +45,31 @@ for ($ii=1;$ii<96;$ii++) {
     $i=0;
     $matches=false;
     if ($file) {
-	preg_match_all('/balloonContentBody.*\/milestones\/(.*)\/.*balloonContentHeader: "(.*)".*coordinates:.*\[(.*), (.*)\]/sUsi',$file, $matches);
-        //print_r($matches);
+		preg_match_all('/balloonContentBody.*\/milestones\/(.*)\/.*balloonContentHeader: "(.*)".*coordinates:.*\[(.*), (.*)\]/sUsi',$file, $matches);
 
-	for ($i=0; $i<count($matches[1]); $i++) {
-	    $id = $matches[1][$i];
-	    $link="https://гибдд.рф/milestones/".$matches[1][$i]."/";
-	    $name=trim(str_replace('&quot;', '"', $matches[2][$i]));
-	    $lat=1*trim($matches[3][$i]);
-	    $lng=1*trim($matches[4][$i]);
-	    //echo "$lat|$lng $name ($link)\n";
-	    //echo "$lng\n";
-	    if (!update_object_int($id,$lng,$lat,"cam",$name,null,$link,$index)) {
-		echo "Failed: $lat|$lng $name ($link)\n";
-	    };
-	    $ids[]=$id;
-	};
-	echo "Region loaded success: $i\n";
+		for ($i=0; $i<count($matches[1]); $i++) {
+			$id = $matches[1][$i];
+			$link="https://гибдд.рф/milestones/".$matches[1][$i]."/";
+			$name=trim(str_replace('&quot;', '"', $matches[2][$i]));
+			$lat=1*trim($matches[3][$i]);
+			$lng=1*trim($matches[4][$i]);
+			if (!update_object_int($id,$lng,$lat,"cam",$name,null,$link,$index)) {
+				echo "Failed: $lat|$lng $name ($link) \r\n";
+			};
+			$ids[]=$id;
+		};
+		echo "Region ".$ii." loaded success: $i \r\n";
     } else {
-	echo "Region loading failed\n";
-	$need_clean=false;
+		echo "Region ".$ii." loading failed \r\n";
+		$need_clean=false;
     }
 }
 
 if ($need_clean) {
-    echo "Starting cleaning...\n";
+    echo "Starting cleaning...\r\n";
     clean_objects($index,'must_not',$ids);
+} else {
+	echo "Cleaning canceled, we have broken regions \r\n";
 };
 
 replace_index_alias($index,"roadsituation_gibdd");
