@@ -39,7 +39,7 @@ foreach ($files as $file) {
     $ii=0;
     echo "Region: ".$file."\r\n";
     //$url = "https://speedcamonline.ru/primo/$file/nomobile/";
-    $url = "https://speedcamonline.ru/primo/$file&filter_id=&cam_name=&cam_adress=&cam_N=&cam_E=&region=-1&kind_list=1000,0,3,12,14,1"
+    $url = "https://speedcamonline.ru/primo/$file&filter_id=&cam_name=&cam_adress=&cam_N=&cam_E=&region=-1&kind_list=1000,0,3,12,14,1";
     echo "File ".$url;
     $filec = @file($url,false,$context);
     if ($filec) {
