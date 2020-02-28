@@ -16,12 +16,11 @@ function yandexTile($lng1,$lat1,$lng2,$lat2,$zoom) {
     $tile2 = $yandex->fromGeoPoint ($lng2, $lat2, $zoom);
     
     return array(
-		    'xmax'=>max(intdiv($tile1->x,256),intdiv($tile2->x,256)),
-		    'xmin'=>min(intdiv($tile1->x,256),intdiv($tile2->x,256)),
-		    'ymax'=>max(intdiv($tile1->y,256),intdiv($tile2->y,256)),
-		    'ymin'=>min(intdiv($tile1->y,256),intdiv($tile2->y,256))
-		);
-    //var_dump($tile->x,);
+		'xmax'=>max(intdiv($tile1->x,256),intdiv($tile2->x,256)),
+		'xmin'=>min(intdiv($tile1->x,256),intdiv($tile2->x,256)),
+		'ymax'=>max(intdiv($tile1->y,256),intdiv($tile2->y,256)),
+		'ymin'=>min(intdiv($tile1->y,256),intdiv($tile2->y,256))
+	);
 }
 
 function correct_coords($x,$min,$max) {
@@ -53,11 +52,11 @@ function rollCoordinates($geometry) {
 function point_in_coords($point,$coords) {
 
     if (( $point['lon']<min($coords['x1'],$coords['x2']) ) or ( $point['lon']>max($coords['x1'],$coords['x2']) ))  {
-	return FALSE;
+		return FALSE;
     };
     
     if (( $point['lat']<min($coords['y1'],$coords['y2']) ) or ( $point['lat']>max($coords['y1'],$coords['y2']) ))  {
-	return FALSE;
+		return FALSE;
     };
     
     return TRUE;
@@ -149,9 +148,9 @@ function convert_coords($x1,$y1,$x2,$y2) {
     $arr=[];
 
     for ($qyn=$qy1; $qyn<=$qy2; $qyn++) {
-	for ($qxn=$qx1; $qxn<=$qx2; $qxn++) {
-	    $arr[]=((($qyn-1)*$xq))+$qxn;
-	}
+		for ($qxn=$qx1; $qxn<=$qx2; $qxn++) {
+			$arr[]=((($qyn-1)*$xq))+$qxn;
+		}
     };
     return $arr;
 }
@@ -367,10 +366,9 @@ function replace_index_alias($index, $alias) {
 function clean_objects($index, $type, $range) {
     global $client;
 
-    $index_type = check_object_type($type);
-    if (!$index_type) {
-	add_error("Wrong type");
-    };
+    if (in_array($type,['must','must_not'])) {
+		add_error("Wrong type");
+	}
 
     $params['index'] = $index;
     $params['body']['query']['bool'][$type] =
@@ -382,9 +380,9 @@ function clean_objects($index, $type, $range) {
 
     try {
         $result = $client->deleteByQuery($params);
-	return true;
+		return true;
     } catch (Exception $e)  {
-	return false;
+		return false;
     }
 }
 
@@ -396,7 +394,7 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 
     $index_type = check_object_type($type);
     if (!$index_type) {
-	add_error("Wrong type");
+		add_error("Wrong type");
     };
 
 	$geometry = array('type'=>"Point","coordinates"=>Array($lng,$lat));
@@ -421,9 +419,9 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 
     try {
         $result = $client->index($params);
-	return true;
+		return true;
     } catch (Exception $e)  {
-	return false;
+		return false;
     }
 }
 
@@ -512,6 +510,7 @@ function get_quadr($quadr) {
 		$iall = $iloaded;
 		$iall = 1*$result['hits']['total']['value'];
     } while ($iloaded<$iall);
+	
     $quadrdata=[];
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
