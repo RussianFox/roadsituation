@@ -366,7 +366,7 @@ function replace_index_alias($index, $alias) {
 function clean_objects($index, $type, $range) {
     global $client;
 
-    if (in_array($type,['must','must_not'])) {
+    if (!in_array($type,['must','must_not'])) {
 		add_error("Wrong type");
 	}
 
