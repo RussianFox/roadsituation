@@ -5,3 +5,4 @@ php /srv/www/htdocs/roadsituation/server/scripts/set_gibdd.php >> /var/log/roads
 php /srv/www/htdocs/roadsituation/server/scripts/set_speedcamonline.php >> /var/log/roadsituation/speedcamonline.log
 php /srv/www/htdocs/roadsituation/server/scripts/set_transportmos.php >> /var/log/roadsituation/transportmos.log
 php /srv/www/htdocs/roadsituation/server/scripts/set_i.centr.by.php >> /var/log/roadsituation/set_i.centr.by.log
+php /srv/www/htdocs/roadsituation/server/scripts/set_saratov.gov.ru.php >> /var/log/roadsituation/set_saratov.gov.ru.log
