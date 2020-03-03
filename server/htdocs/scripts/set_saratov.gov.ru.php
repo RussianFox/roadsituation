@@ -26,11 +26,12 @@ $file=@file_get_contents($url);
 if ($file) {
 	echo "$url loaded \r\n";
 	$file = json_decode($file, true);
+	var_dump
 	
 	foreach ($file['features'] as $feature) {
 	
 		$prop = $feature['properties'];
-		if (!empty($prop['factend'])) { continue; };
+		if ( (!empty($prop['factend'])) or ($prop['factend'] == "01.01.1970") ) { continue; };
 		$object_id=$prop['id'];
 		$type="maintenance";
 		$name = $prop['worktype']." ".$prop['note']." ".$prop['name']." ".$prop['contractor']." тел. ".$prop['phone'].". Плановая дата окончания: ".$prop['planend']." " ;
