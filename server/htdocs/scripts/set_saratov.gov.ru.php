@@ -35,7 +35,8 @@ if ($file) {
 		$type="maintenance";
 		$name = $prop['worktype']." ".$prop['name']." ".$prop['contractor']." тел. ".$prop['phone'].". Плановая дата окончания: ".$prop['planend']." " ;
 		$link="http://dorogi.saratov.gov.ru/maprepair.php";
-		$geometry=checkGeometry($feature['geometry']);
+		$geometry = $feature['geometry'];
+		$geometry['coordinates']=checkGeometry($geometry['coordinates']);
 		
 		$coordinates=array();
 		If ($geometry['type'] == "Point") {
