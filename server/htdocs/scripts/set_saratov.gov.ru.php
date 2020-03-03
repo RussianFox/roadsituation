@@ -37,6 +37,7 @@ if ($file) {
 		$link="http://dorogi.saratov.gov.ru/maprepair.php";
 		$geometry = $feature['geometry'];
 		$geometry['coordinates']=checkGeometry($geometry['coordinates']);
+		$geometry['coordinates']=rollCoordinates($geometry['coordinates']);
 		
 		$coordinates=array();
 		If ($geometry['type'] == "Point") {
@@ -55,7 +56,7 @@ if ($file) {
 			$center = center_line($coordinates);
 		} else {
 			echo "Geometry invalid on $object_id \r\n";
-		    continue;
+			continue;
 		}
 
 		update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
