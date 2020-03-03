@@ -28,6 +28,26 @@ function correct_coords($x,$min,$max) {
     return $xn;
 }
 
+function checkGeometry($geometry) {
+	if (is_array($geometry)) {
+		if (count($geometry)==2) {
+			if ((array_key_exists(0,$geometry)) and (array_key_exists(1,$geometry))) {
+				if ((is_numeric($geometry[0])) and (is_numeric($geometry[1]))) {
+					$geometry[0]=1*$geometry[0];
+					$geometry[1]=1*$geometry[1];
+					return $geometry;
+				}
+			}
+		};
+		foreach ($geometry as &$geom) {
+			$geom = checkGeometry($geom);
+		}
+		return $geometry;
+	} else {
+		return false;
+	}
+}
+
 function rollCoordinates($geometry) {
 	if (is_array($geometry)) {
 		if (count($geometry)==2) {

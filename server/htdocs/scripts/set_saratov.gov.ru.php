@@ -33,9 +33,9 @@ if ($file) {
 		if ( (!empty($prop['factend'])) and ($prop['factend'] != "01.01.1970") ) { continue; };
 		$object_id=$prop['id'];
 		$type="maintenance";
-		$name = $prop['worktype']." ".$prop['note']." ".$prop['name']." ".$prop['contractor']." тел. ".$prop['phone'].". Плановая дата окончания: ".$prop['planend']." " ;
+		$name = $prop['worktype']." ".$prop['name']." ".$prop['contractor']." тел. ".$prop['phone'].". Плановая дата окончания: ".$prop['planend']." " ;
 		$link="http://dorogi.saratov.gov.ru/maprepair.php";
-		$geometry=$feature['geometry'];
+		$geometry=checkGeometry($feature['geometry']);
 		
 		$coordinates=array();
 		If ($geometry['type'] == "Point") {
@@ -53,6 +53,7 @@ if ($file) {
 			};
 			$center = center_line($coordinates);
 		} else {
+			echo "Geometry invalid on $object_id \r\n";
 		    continue;
 		}
 
