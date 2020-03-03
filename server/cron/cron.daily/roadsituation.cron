@@ -4,3 +4,4 @@ php /srv/www/htdocs/roadsituation/server/scripts/set_gati.php >> /var/log/roadsi
 php /srv/www/htdocs/roadsituation/server/scripts/set_gibdd.php >> /var/log/roadsituation/gibdd.log
 php /srv/www/htdocs/roadsituation/server/scripts/set_speedcamonline.php >> /var/log/roadsituation/speedcamonline.log
 php /srv/www/htdocs/roadsituation/server/scripts/set_transportmos.php >> /var/log/roadsituation/transportmos.log
+php /srv/www/htdocs/roadsituation/server/scripts/set_i.centr.by.php >> /var/log/roadsituation/set_i.centr.by.log
