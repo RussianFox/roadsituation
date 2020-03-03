@@ -29,7 +29,7 @@ if ($file) {
 	
 	foreach ($file['features'] as $feature) {
 	
-		$prop = $feature['properties']
+		$prop = $feature['properties'];
 		if ($prop['factend']) { continue; };
 		$object_id=$prop['id'];
 		$type="maintenance";
