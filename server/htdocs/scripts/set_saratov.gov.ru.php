@@ -26,7 +26,6 @@ $file=@file_get_contents($url);
 if ($file) {
 	echo "$url loaded \r\n";
 	$file = json_decode($file, true);
-	var_dump
 	
 	foreach ($file['features'] as $feature) {
 	
