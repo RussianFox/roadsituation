@@ -30,7 +30,7 @@ if ($file) {
 	foreach ($file['features'] as $feature) {
 	
 		$prop = $feature['properties'];
-		if ( (!empty($prop['factend'])) or ($prop['factend'] == "01.01.1970") ) { continue; };
+		if ( (!empty($prop['factend'])) and ($prop['factend'] != "01.01.1970") ) { continue; };
 		$object_id=$prop['id'];
 		$type="maintenance";
 		$name = $prop['worktype']." ".$prop['note']." ".$prop['name']." ".$prop['contractor']." тел. ".$prop['phone'].". Плановая дата окончания: ".$prop['planend']." " ;
