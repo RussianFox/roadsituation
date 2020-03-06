@@ -895,11 +895,13 @@
 		var url_string = window.location.href;
 		var url = new URL(url_string);
 		var c = url.searchParams.get("coord");
-		savePos2 = c.split(',');
-		if (savePos2.length == 3) {
-			lat = savePos2[0]
-			lng = savePos2[1]
-			zoom = savePos2[2]
+		if (c) {
+			savePos2 = c.split(',');
+			if (savePos2.length == 3) {
+				lat = savePos2[0]
+				lng = savePos2[1]
+				zoom = savePos2[2]
+			}
 		}
 		if (lat) {
 			mymap.setView([Number(savePos[0]),Number(savePos[1])], Number(savePos[2]));
