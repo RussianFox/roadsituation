@@ -277,13 +277,7 @@
 	
 	var mymap = L.map('mapid');
 	
-	if (Cookies.get('mapCenter')) {
-		var lat, lng, zoom
-		savePos = Cookies.get('mapCenter').split(',')
-		mymap.setView([Number(savePos[0]),Number(savePos[1])], Number(savePos[2]))
-	} else {
-		mymap.setView([59.023,30.123], 13)
-	}
+	firstMapPosition();
 
 	rsLayers['cam'] = L.layerGroup()
 	rsLayers['other'] = L.layerGroup().addTo(mymap)
@@ -887,11 +881,38 @@
 		}
 	}
 	
-	$('.leaflet-container').css('cursor','crosshair');
+	function firstMapPosition() {
+		var lat, lng, zoom
+		if (Cookies.get('mapCenter')) {
+			savePos = Cookies.get('mapCenter').split(',')
+			if (savePos.length == 3) {
+				lat = savePos[0]
+				lng = savePos[1]
+				zoom = savePos[2]
+			}
+		}
+		
+		var url_string = window.location.href;
+		var url = new URL(url_string);
+		var c = url.searchParams.get("coord");
+		savePos2 = c.split(',');
+		if (savePos2.length == 3) {
+			lat = savePos2[0]
+			lng = savePos2[1]
+			zoom = savePos2[2]
+		}
+		if (lat) {
+			mymap.setView([Number(savePos[0]),Number(savePos[1])], Number(savePos[2]));
+			return;
+		}
+		mymap.setView([59.023,30.123], 13)
+	}
+	
 	function saveMapPosition() {
 		Cookies.set('mapCenter', mymap.getCenter().lat+', '+mymap.getCenter().lng+', '+mymap._zoom, { expires:365 });
 	}
 	
+	$('.leaflet-container').css('cursor','crosshair');
 	changeQuadrs();
 	loadMarkers();
 	
