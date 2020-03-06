@@ -885,7 +885,7 @@
 		var lat, lng, zoom
 		if (Cookies.get('mapCenter')) {
 			savePos = Cookies.get('mapCenter').split(',')
-			if (savePos.length == 3) {
+			if (savePos.length >2) {
 				lat = savePos[0]
 				lng = savePos[1]
 				zoom = savePos[2]
@@ -897,17 +897,21 @@
 		var c = url.searchParams.get("coord");
 		if (c) {
 			savePos2 = c.split(',');
-			if (savePos2.length == 3) {
+			if (savePos2.length > 2) {
 				lat = savePos2[0]
 				lng = savePos2[1]
 				zoom = savePos2[2]
 			}
 		}
-		if (lat) {
-			mymap.setView([Number(lat),Number(lng)], Number(zoom));
+		if (lat && lng) {
+			if (zoom) {
+				mymap.setView([Number(lat),Number(lng)], Number(zoom));
+				return;
+			}		
+			mymap.setView([Number(lat),Number(lng)], 16);
 			return;
 		}
-		mymap.setView([59.023,30.123], 13)
+		mymap.setView([59.93644042418626, 30.283813476562504], 9)
 	}
 	
 	function saveMapPosition() {
