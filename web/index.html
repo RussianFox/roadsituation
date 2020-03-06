@@ -904,7 +904,7 @@
 			}
 		}
 		if (lat) {
-			mymap.setView([Number(savePos[0]),Number(savePos[1])], Number(savePos[2]));
+			mymap.setView([Number(lat),Number(lng)], Number(zoom));
 			return;
 		}
 		mymap.setView([59.023,30.123], 13)
