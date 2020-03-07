@@ -11,7 +11,7 @@ function numberFormat($digit, $width) {
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
 $index="ufacity";
-$bool=$client->indices()->exists($params);
+$bool=$client->indices()->exists(['index' => $index]);
 if (!$bool) {
 	echo "Index is not exist, creating it \r\n";
     $response = $client->indices()->create($params);

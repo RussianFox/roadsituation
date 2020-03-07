@@ -5,14 +5,11 @@ include '../staff/functions.php';
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
 $index="saratov_gov_ru";
-
-$params = ['index' => $index];
-$bool=$client->indices()->exists($params);
+$bool=$client->indices()->exists(['index' => $index]);
 if (!$bool) {
 	echo "Index is not exist, creating it \r\n";
     $response = $client->indices()->create($params);
 }
-
 $query = $client->count(['index' => $index]);
 $docsCount_start=1*$query['count'];
 
@@ -64,14 +61,11 @@ if ($file) {
 	}
 	
 	echo "Loading objects success \r\n";
-	
 	$query = $client->count(['index' => $index]);
 	$docsCount_add=1*$query['count'];
 	$docsCount_clean=$docsCount_add;
-	
 	clean_objects($index,'must_not',$ids);
 	echo "Cleaning success \r\n";
-
 	replace_index_alias($index,"roadsituation_saratov_gov_ru");
 	$query = $client->count(['index' => $index]);
 	$docsCount_clean=1*$query['count'];
