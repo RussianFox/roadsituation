@@ -476,14 +476,13 @@ function remove_object($index,$id,$aid) {
 	global $client;
 		
 	$params = [
-    	'index' => $index,
-    	'id'    => $id,
-    	'type' => '_doc'
+    	'index' => $index
     ];
 
-	$params['body']['query']['bool']['must_not']['term'] =
+	$params['body']['query']['bool']['must']['term'] =
 	[
-		"aid" => $aid
+		"aid" => $aid,
+		"_id": $id
 	];
 
 	$params['body']['script'] =
