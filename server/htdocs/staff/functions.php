@@ -600,7 +600,7 @@ function get_quadr($quadr) {
 		
         $params['body']['query']['bool']['must_not']['term'] =
 		[
-		    "delete" => true
+		    "delete" => "true"
 		];
 		
 		$result = $client->search($params);
