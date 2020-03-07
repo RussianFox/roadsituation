@@ -554,7 +554,7 @@ function clean_aid($items) {
 	foreach($items as &$item) {
 		if (isset($item['aid'])) {
 			if ( ($item['aid']!='') and ($item['aid']!='!') ) {
-				$item['aid']='!'
+				$item['aid']='!';
 			} else {
 				unset($item['aid']);
 			}
