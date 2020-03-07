@@ -11,6 +11,11 @@ function numberFormat($digit, $width) {
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
 $index="ufacity";
+$bool=$client->indices()->exists($params);
+if (!$bool) {
+	echo "Index is not exist, creating it \r\n";
+    $response = $client->indices()->create($params);
+}
 $query = $client->count(['index' => $index]);
 $docsCount_start=1*$query['count'];
 $ids = array();
