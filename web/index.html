@@ -592,6 +592,18 @@
 			}
 	}
 
+	function removeObject(index, id) {
+	
+		$.post( "delete.php", { index: index, id: id, aid: aid})
+		  .done(function( data ) {
+			debug(data)
+			userMessage( "Removed object success" );
+		  })
+		  .fail(function( data ) {
+			debug(data)
+			userError( "Removed object failed" );
+		  });
+	}
 	
 	function confirmObject(index, id, val) {
 	
@@ -610,10 +622,13 @@
 		var mFeature = e.popup._source.feature.properties
 		var link=urlString(mFeature.link,' ')
 		var addition = parseTypesObj(mFeature.type)+' '+parseAdditions(mFeature.addition)
-		popupText="<img style='max-width: 25px;' src='src/img/medium/"+mFeature.type+".png'> "+ParseData(mFeature.time)+" <br />"+addition +" <p><b>"+mFeature.text+"</b></p> <div lat='"+e.popup._source._latlng.lat+"' lng='"+e.popup._source._latlng.lng+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'><div class='confirm-button'>Confirm("+mFeature.confirm_count+")</div><div class='disprove-button'>Discard("+mFeature.discard_count+")</div></div> <div style='text-align:right'>"+link+"</div>"
+		popupText="<img style='max-width: 25px;' src='src/img/medium/"+mFeature.type+".png'> "+ParseData(mFeature.time)+" <br />"+addition +" <p><b>"+mFeature.text+"</b></p> <div lat='"+e.popup._source._latlng.lat+"' lng='"+e.popup._source._latlng.lng+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'><div class='remove-button'>Delete</div><div class='confirm-button'>Confirm("+mFeature.confirm_count+")</div><div class='disprove-button'>Discard("+mFeature.discard_count+")</div></div> <div style='text-align:right'>"+link+"</div>"
 		e.popup.setContent(popupText)
 		$(".disprove-button").button({icon: "ui-icon-circle-close",showLabel: false}).click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, -1); mymap.closePopup()});
 		$(".confirm-button").button({icon: "ui-icon-circle-check",showLabel: false}).click(function() {confirmObject(e.target.feature.properties.index, e.target.feature.properties.id, 1); mymap.closePopup()});
+		if (typeof mFeature.aid === 'undefined') { $(".remove-button").remove(); };
+		$(".remove-button").button({icon: "ui-icon-closethick",showLabel: false}).click(function() {removeObject(e.target.feature.properties.index, e.target.feature.properties.id); mymap.closePopup()});
+
 	}
 	
 	function debugConsole() {
