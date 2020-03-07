@@ -482,7 +482,7 @@ function remove_object($index,$id,$aid) {
 
 	$params['body']['query']['bool']['must_not']['term'] =
 	[
-		"aid" => aid
+		"aid" => $aid
 	];
 
 	$params['body']['script'] =
