@@ -552,11 +552,11 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
 
 function clean_aid($items) {
 	foreach($items as &$item) {
-		if (isset($item['aid'])) {
-			if ( ($item['aid']!='') and ($item['aid']!='!') ) {
-				$item['aid']='!';
+		if (isset($item['_source']['aid'])) {
+			if ( ($item['_source']['aid']!='') and ($item['_source']['aid']!='!') ) {
+				$item['_source']['aid']='!';
 			} else {
-				unset($item['aid']);
+				unset($item['_source']['aid']);
 			}
 		}
 	};
@@ -588,17 +588,18 @@ function get_quadr($quadr) {
 		    ]
 		];
 		$result = $client->search($params);
-		$items = array_merge($items,clean_aid($result['hits']['hits']));
+		$items = array_merge($items,$result['hits']['hits']);
 		$iloaded=count($items);
-		$iall = $iloaded;
 		$iall = 1*$result['hits']['total']['value'];
     } while ($iloaded<$iall);
 	
     $quadrdata=[];
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
-    $quadrdata['hits']['total']=$result['hits']['total']['value'];
+    $quadrdata['hits']['elastic']=$result['hits']['total']['value'];
+	items = clean_aid($items);
     $quadrdata['items']=array_merge($items,yandex_quadr($coords));
+	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
     return $quadrdata;
 }
