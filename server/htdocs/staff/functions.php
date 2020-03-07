@@ -489,7 +489,7 @@ function remove_object($index,$id,$aid) {
         'params' => [
 			'value' => true
 		]
-	]
+	];
 
     try {
         $result = $client->updateByQuery($params);
