@@ -513,7 +513,7 @@
 			objAddition = objAddition+$( this )[0].value
 		})
 		
-		$.post( "set.php", { add: '', lng: popup._latlng.lng, lat: popup._latlng.lat, type: objType, text: objMessage, addition: objAddition })
+		$.post( "set.php", { add: '', lng: popup._latlng.lng, lat: popup._latlng.lat, type: objType, text: objMessage, addition: objAddition, aid: aid })
 		  .done(function( data ) {
 			userMessage( data );
 		  })
