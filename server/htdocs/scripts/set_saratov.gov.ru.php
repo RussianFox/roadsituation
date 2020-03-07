@@ -8,7 +8,7 @@ $index="saratov_gov_ru";
 $bool=$client->indices()->exists(['index' => $index]);
 if (!$bool) {
 	echo "Index is not exist, creating it \r\n";
-    $response = $client->indices()->create($params);
+    $response = $client->indices()->create(['index' => $index]);
 }
 $query = $client->count(['index' => $index]);
 $docsCount_start=1*$query['count'];
