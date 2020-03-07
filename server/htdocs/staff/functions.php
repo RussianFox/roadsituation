@@ -219,30 +219,6 @@ function add_success($text) {
     exit(0);
 }
 
-function remove_object($index,$id,$aid='') {
-    global $client;
-	
-    if ($aid=='') {
-		add_error("Wrong author id");
-	}
-
-    $params['index'] = $index;
-    $params['body']['query']['bool']['must'] =
-	[
-	    'terms'=>[
-			'_id'=>$id,
-			'aid'=>$aid
-	    ]
-	];
-
-    try {
-        $result = $client->deleteByQuery($params);
-		return true;
-    } catch (Exception $e)  {
-		return false;
-    }
-}
-
 function vote_object($index,$id,$vote) {
     global $client;
 
@@ -445,7 +421,7 @@ function clean_objects($index, $type, $range) {
     $params['body']['query']['bool'][$type] =
 	[
 	    'terms'=>[
-		'_id'=>$range
+			'_id'=>$range
 	    ]
 	];
 
@@ -496,6 +472,33 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
     }
 }
 
+function remove_object($index,$id,$aid) {
+	$params = [
+    	'index' => $index,
+    	'id'    => $id
+    ];
+
+	$params['body']['query']['bool']['must_not']['term'] =
+	[
+		"aid": aid
+	];
+
+	$params['body']['script'] =
+	[
+        'inline' => 'ctx._source.delete = value',
+        'params' => [
+			'value' => true
+		]
+	]
+
+    try {
+        $result = $client->updateByQuery($params);
+		return true;
+    } catch (Exception $e)  {
+		var_dump($e);
+		return false;
+    }
+}
 
 function update_object_int($id,$lng, $lat, $type="other", $text="", $addition="", $source, $indexname,$geometry=null) {
     global $client;
@@ -587,6 +590,12 @@ function get_quadr($quadr) {
 				'lon'=>$coords['x2']
 		    ]
 		];
+		
+        $params['body']['query']['bool']['must_not']['term'] =
+		[
+		    "delete": true
+		];
+		
 		$result = $client->search($params);
 		$items = array_merge($items,$result['hits']['hits']);
 		$iloaded=count($items);
