@@ -13,7 +13,6 @@ if (isset($_POST['index'])) {
 			add_error("Not set author id");
 		}
 		add_error("Not set element id");
-    }
 };
 add_error("Not set index");
 
