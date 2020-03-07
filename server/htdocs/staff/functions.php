@@ -497,7 +497,7 @@ function remove_object($index,$id,$aid) {
 	[
         'inline' => 'ctx._source.delete = value',
         'params' => [
-			'value' => true
+			'value' => 1
 		]
 	];
 
