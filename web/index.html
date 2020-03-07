@@ -926,7 +926,11 @@
 	setInterval(function(){ loadMarkers(false); }, 30000);
 	
 	$( document ).ready(function() {
-		$.getScript( "settings.js").always(function() { 
+		$.getScript( "settings.js").always(function() {
+			var url_string = window.location.href;
+			var url = new URL(url_string);
+			var c = url.searchParams.get("debug");
+			if (c) { rsDebug = true; }
 			if (rsDebug) {
 				mymap.addControl(new debugControl());
 			}
