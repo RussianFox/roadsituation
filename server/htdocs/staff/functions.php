@@ -320,6 +320,10 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
 		add_error("Wrong type");
     };
 
+	if (!$aid) {
+		$aid='';
+	}
+
     $date = new DateTime("now", new DateTimeZone("UTC"));
     $index="roadsituation_".$index_type."_".($index_type=='temporary'?$date->format('Y-m-d-H-i'):$date->format('Y-m-d'));
 
