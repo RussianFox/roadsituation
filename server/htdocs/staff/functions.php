@@ -597,7 +597,7 @@ function get_quadr($quadr) {
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
     $quadrdata['hits']['elastic']=$result['hits']['total']['value'];
-	items = clean_aid($items);
+	$items = clean_aid($items);
     $quadrdata['items']=array_merge($items,yandex_quadr($coords));
 	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
