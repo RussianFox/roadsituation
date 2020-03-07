@@ -22,7 +22,7 @@ if (isset($_POST['add'])) {
 				};
 				$source=null;
 				$source=parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
-				add_object($_POST['lng'],$_POST['lat'],$_POST['type'],$text,$addition,$source,$aid);
+				add_object(1*$_POST['lng'],1*$_POST['lat'],$_POST['type'],$text,$addition,$source,$aid);
 				add_success("Object added");
 			}
 			add_error("Not set latitude");

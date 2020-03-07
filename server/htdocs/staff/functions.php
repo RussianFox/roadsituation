@@ -327,7 +327,7 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
     $date = new DateTime("now", new DateTimeZone("UTC"));
     $index="roadsituation_".$index_type."_".($index_type=='temporary'?$date->format('Y-m-d-H-i'):$date->format('Y-m-d'));
 
-	$geometry = array('type'=>"Point","coordinates"=>Array($lng,$lat));
+	$geometry = array('type'=>"Point","coordinates"=>Array(1*$lng,1*$lat));
 
     $params = [
 	'index' => $index,
@@ -550,6 +550,18 @@ function update_object_int($id,$lng, $lat, $type="other", $text="", $addition=""
     }
 }
 
+function clean_aid($items) {
+	foreach($items as &$item) {
+		if (isset($item['aid'])) {
+			if ( ($item['aid']!='') and ($item['aid']!='!') ) {
+				$item['aid']='!'
+			} else {
+				unset($item['aid']);
+			}
+		}
+	};
+	return $items;
+};
 
 function get_quadr($quadr) {
     global $client;
@@ -576,7 +588,7 @@ function get_quadr($quadr) {
 		    ]
 		];
 		$result = $client->search($params);
-		$items = array_merge($items,$result['hits']['hits']);
+		$items = array_merge($items,clean_aid($result['hits']['hits']));
 		$iloaded=count($items);
 		$iall = $iloaded;
 		$iall = 1*$result['hits']['total']['value'];
