@@ -480,7 +480,7 @@ function remove_object($index,$id,$aid) {
 
 	$params['body']['query']['bool']['must_not']['term'] =
 	[
-		"aid": aid
+		"aid" => aid;
 	];
 
 	$params['body']['script'] =
@@ -593,7 +593,7 @@ function get_quadr($quadr) {
 		
         $params['body']['query']['bool']['must_not']['term'] =
 		[
-		    "delete": true
+		    "delete" => true
 		];
 		
 		$result = $client->search($params);
