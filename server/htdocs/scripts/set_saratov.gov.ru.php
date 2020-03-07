@@ -71,12 +71,10 @@ if ($file) {
 	
 	clean_objects($index,'must_not',$ids);
 	echo "Cleaning success \r\n";
-	
+
+	replace_index_alias($index,"roadsituation_saratov_gov_ru");
 	$query = $client->count(['index' => $index]);
 	$docsCount_clean=1*$query['count'];
-	
-	replace_index_alias($index,"roadsituation_saratov_gov_ru");
-	
 	echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
 } else {
 	echo "Load $url failed \r\n";

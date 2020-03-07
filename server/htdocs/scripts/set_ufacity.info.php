@@ -10,32 +10,57 @@ function numberFormat($digit, $width) {
 
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
-$index="icentreby";
+$index="ufacity";
 $query = $client->count(['index' => $index]);
 $docsCount_start=1*$query['count'];
 $ids = array();
 
-$url = "http://i.centr.by/inforoads/api/v3/repairs";
+$url = "https://ufacity.info/remontdor/api/data/";
 echo "Start loading: $url ..... \r\n";
 $file=false;
 $file=@file_get_contents($url);
 
 if ($file) {
 	echo "$url loaded \r\n";
-	$file = str_replace('}"', '}', $file);
-	$file = str_replace('"{', '{', $file);
-	$file = str_replace('\"', '"', $file);
 	$file = json_decode($file, true);
 	
-	foreach ($file as $feature) {
+	foreach ($file['limit']['features'] as $feature) {
 	
-		$object_id=$feature['idRd'];
+		$object_id=$feature['id'];
 		$type="maintenance";
-		$name = "Road repair ".$feature['roadNom']." ".$feature['roadTitle']." (".$feature['kmBegin']."-".$feature['kmEnd']."km) <br>".$feature['dateBegin']." - ".$feature['dateEnd'];
-		$link="http://i.centr.by/inforoads/ru/repairs";
+		$name = "Ремонт дороги, движение ограничено";
+		$link="https://ufacity.info/remontdor/";
 		$geometry=$feature['geometry'];
 		
-		//echo $object_id." ".$geometry['type']."\r\n";
+		$coordinates=array();
+		If ($geometry['type'] == "Point") {
+			$center = array('lat'=>$geometry['coordinates'][1],"lng"=>$geometry['coordinates'][0]);
+		} elseif ($geometry['type'] == "LineString") {
+			foreach ($geometry['coordinates'] as $coordinate) {
+				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
+			};
+			$center = center_line($coordinates);
+		} else if ($geometry['type'] == "MultiLineString") {
+			foreach ($geometry['coordinates'] as $coords) {
+			    foreach ($coords as $coordinate) {
+				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
+			    };
+			};
+			$center = center_line($coordinates);
+		} else {
+		    continue;
+		}
+
+		update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
+		$ids[] = $object_id;
+	}
+	foreach ($file['closed']['features'] as $feature) {
+	
+		$object_id=$feature['id'];
+		$type="maintenance";
+		$name = "Ремонт дороги, движение перекрыто";
+		$link="https://ufacity.info/remontdor/";
+		$geometry=$feature['geometry'];
 		
 		$coordinates=array();
 		If ($geometry['type'] == "Point") {
@@ -61,12 +86,13 @@ if ($file) {
 	}
 	
 	echo "Loading objects success \r\n";
+	
 	$query = $client->count(['index' => $index]);
 	$docsCount_add=1*$query['count'];
 	$docsCount_clean=$docsCount_add;
 	//clean_objects($index,'must_not',$ids);
 	//echo "Cleaning success \r\n";
-	replace_index_alias($index,"roadsituation_icentreby");
+	replace_index_alias($index,"roadsituation_ufacity");
 	$query = $client->count(['index' => $index]);
 	$docsCount_clean=1*$query['count'];
 	echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
