@@ -867,8 +867,8 @@
 	}
 	
 	function firstRun(forceOpen=false) {
-		if (!Cookies.get('_roadsituationaid') {
-			aid = uuidv4()
+		if (!Cookies.get('_roadsituationaid')) {
+			aid = uuidv4();
 			Cookies.set('_roadsituationaid', aid, { expires:3650 });
 		} else {
 			aid = Cookies.get('_roadsituationaid');
