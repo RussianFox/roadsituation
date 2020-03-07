@@ -579,7 +579,7 @@ function get_quadr($quadr) {
         $params['index'] = 'roadsituation*';
 		$params['size'] = 100;
 		$params['from'] = $iloaded;
-        $params['body']['query']['geo_bounding_box']['location'] =
+        $params['body']['query']['bool']['must']['geo_bounding_box']['location'] =
 		[
 		    'top_left'=>[
 				'lat'=>$coords['y2'],
