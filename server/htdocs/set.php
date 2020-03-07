@@ -6,24 +6,28 @@ cors_header();
 
 if (isset($_POST['add'])) {
     if (isset($_POST['type'])) {
-	if (isset($_POST['lat'])) {
-	    if (isset($_POST['lng'])) {
-		$text="";
-		$addition="";
-		if (isset($_POST['text'])) {
-		    $text = $_POST['text'];
-		};
-		if (isset($_POST['addition'])) {
-		    $addition = $_POST['addition'];
-		};
-		$source=null;
-		$source=parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
-		add_object($_POST['lng'],$_POST['lat'],$_POST['type'],$text,$addition,$source);
-		add_success("Object added");
-	    }
-	    add_error("Not set latitude");
-	}
-	add_error("Not set longitude");
+		if (isset($_POST['lat'])) {
+			if (isset($_POST['lng'])) {
+				$text="";
+				$addition="";
+				$aid = null;
+				if (isset($_POST['aid'])) {
+					$aid = $_POST['aid'];
+				}
+				if (isset($_POST['text'])) {
+					$text = $_POST['text'];
+				};
+				if (isset($_POST['addition'])) {
+					$addition = $_POST['addition'];
+				};
+				$source=null;
+				$source=parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+				add_object($_POST['lng'],$_POST['lat'],$_POST['type'],$text,$addition,$source,$aid);
+				add_success("Object added");
+			}
+			add_error("Not set latitude");
+		}
+		add_error("Not set longitude");
     }
     add_error("Not set type");
 };

@@ -219,6 +219,30 @@ function add_success($text) {
     exit(0);
 }
 
+function remove_object($index,$id,$aid='') {
+    global $client;
+	
+    if ($aid=='') {
+		add_error("Wrong author id");
+	}
+
+    $params['index'] = $index;
+    $params['body']['query']['bool']['must'] =
+	[
+	    'terms'=>[
+			'_id'=>$id,
+			'aid'=>$aid
+	    ]
+	];
+
+    try {
+        $result = $client->deleteByQuery($params);
+		return true;
+    } catch (Exception $e)  {
+		return false;
+    }
+}
+
 function vote_object($index,$id,$vote) {
     global $client;
 
@@ -288,7 +312,7 @@ function check_object_type($type) {
     return false;
 }
 
-function add_object($lng, $lat, $type="other", $text="", $addition="", $source="user") {
+function add_object($lng, $lat, $type="other", $text="", $addition="", $source="user", $aid='') {
     global $client;
 
     $index_type = check_object_type($type);
@@ -311,6 +335,7 @@ function add_object($lng, $lat, $type="other", $text="", $addition="", $source="
 				'lon' => $lng
 			],
 			'geometry' => $geometry,
+			'aid' => $aid,
 			'addition' => $addition,
 			'source' => $source,
 			'text' => $text,
