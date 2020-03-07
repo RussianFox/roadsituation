@@ -495,10 +495,7 @@ function remove_object($index,$id,$aid) {
 
 	$params['body']['script'] =
 	[
-        'inline' => 'ctx._source.delete = value',
-        'params' => [
-			'value' => 1
-		]
+        'inline' => 'ctx._source.delete = 1'
 	];
 
     try {
