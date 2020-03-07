@@ -35,54 +35,30 @@ if ($file) {
 		$type="maintenance";
 		$name = "Ремонт дороги, движение ограничено";
 		$link="https://ufacity.info/remontdor/";
-		$geometry=$feature['geometry'];
 		
-		$coordinates=array();
-		If ($geometry['type'] == "Point") {
-			$center = array('lat'=>$geometry['coordinates'][1],"lng"=>$geometry['coordinates'][0]);
-		} elseif ($geometry['type'] == "LineString") {
-			foreach ($geometry['coordinates'] as $coordinate) {
-				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
-			};
-			$center = center_line($coordinates);
-		} else if ($geometry['type'] == "MultiLineString") {
-			foreach ($geometry['coordinates'] as $coords) {
-			    foreach ($coords as $coordinate) {
-				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
-			    };
-			};
-			$center = center_line($coordinates);
-		} else {
+		$geometry=$feature['geometry'];
+		$geometry['coordinates']=checkGeometry($geometry['coordinates']);
+		$geometry['coordinates']=rollCoordinates($geometry['coordinates']);
+		$center = get_coord_center($geometry)
+		if (!$center) {
 		    continue;
 		}
-
+		
 		update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
 		$ids[] = $object_id;
 	}
 	foreach ($file['closed']['features'] as $feature) {
 	
 		$object_id=$feature['id'];
-		$type="maintenance";
+		$type="block";
 		$name = "Ремонт дороги, движение перекрыто";
 		$link="https://ufacity.info/remontdor/";
+
 		$geometry=$feature['geometry'];
-		
-		$coordinates=array();
-		If ($geometry['type'] == "Point") {
-			$center = array('lat'=>$geometry['coordinates'][1],"lng"=>$geometry['coordinates'][0]);
-		} elseif ($geometry['type'] == "LineString") {
-			foreach ($geometry['coordinates'] as $coordinate) {
-				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
-			};
-			$center = center_line($coordinates);
-		} else if ($geometry['type'] == "MultiLineString") {
-			foreach ($geometry['coordinates'] as $coords) {
-			    foreach ($coords as $coordinate) {
-				array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
-			    };
-			};
-			$center = center_line($coordinates);
-		} else {
+		$geometry['coordinates']=checkGeometry($geometry['coordinates']);
+		$geometry['coordinates']=rollCoordinates($geometry['coordinates']);
+		$center = get_coord_center($geometry)
+		if (!$center) {
 		    continue;
 		}
 

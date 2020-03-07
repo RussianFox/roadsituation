@@ -28,6 +28,28 @@ function correct_coords($x,$min,$max) {
     return $xn;
 }
 
+function get_coord_center($geometry) {
+	$coordinates=array();
+	If ($geometry['type'] == "Point") {
+		$center = array('lat'=>$geometry['coordinates'][1],"lng"=>$geometry['coordinates'][0]);
+	} elseif ($geometry['type'] == "LineString") {
+		foreach ($geometry['coordinates'] as $coordinate) {
+			array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
+		};
+		$center = center_line($coordinates);
+	} else if ($geometry['type'] == "MultiLineString") {
+		foreach ($geometry['coordinates'] as $coords) {
+			foreach ($coords as $coordinate) {
+			array_push($coordinates,array('lat'=>$coordinate[1],"lng"=>$coordinate[0]));
+			};
+		};
+		$center = center_line($coordinates);
+	} else {
+		$center = false;
+	}
+	return $center;
+}
+
 function checkGeometry($geometry) {
 	if (is_array($geometry)) {
 		if (count($geometry)==2) {
