@@ -39,10 +39,10 @@ if ($file) {
 		$geometry=$feature['geometry'];
 		$geometry['coordinates']=checkGeometry($geometry['coordinates']);
 		$geometry['coordinates']=rollCoordinates($geometry['coordinates']);
-		$center = get_coord_center($geometry)
+		$center = get_coord_center($geometry);
 		if (!$center) {
 		    continue;
-		}
+		};
 		
 		update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
 		$ids[] = $object_id;
@@ -57,10 +57,10 @@ if ($file) {
 		$geometry=$feature['geometry'];
 		$geometry['coordinates']=checkGeometry($geometry['coordinates']);
 		$geometry['coordinates']=rollCoordinates($geometry['coordinates']);
-		$center = get_coord_center($geometry)
+		$center = get_coord_center($geometry);
 		if (!$center) {
 		    continue;
-		}
+		};
 
 		update_object_int($object_id,$center['lng'],$center['lat'],$type,$name,null,$link,$index,$geometry);
 		$ids[] = $object_id;
@@ -70,7 +70,6 @@ if ($file) {
 	
 	$query = $client->count(['index' => $index]);
 	$docsCount_add=1*$query['count'];
-	$docsCount_clean=$docsCount_add;
 	//clean_objects($index,'must_not',$ids);
 	//echo "Cleaning success \r\n";
 	replace_index_alias($index,"roadsituation_ufacity");
