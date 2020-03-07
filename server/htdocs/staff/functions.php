@@ -473,6 +473,8 @@ function add_object_int($lng, $lat, $type="other", $text="", $addition="", $sour
 }
 
 function remove_object($index,$id,$aid) {
+	global $client;
+		
 	$params = [
     	'index' => $index,
     	'id'    => $id
