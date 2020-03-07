@@ -477,7 +477,8 @@ function remove_object($index,$id,$aid) {
 		
 	$params = [
     	'index' => $index,
-    	'_id'    => $id
+    	'id'    => $id,
+    	'type' => '_doc'
     ];
 
 	$params['body']['query']['bool']['must_not']['term'] =
