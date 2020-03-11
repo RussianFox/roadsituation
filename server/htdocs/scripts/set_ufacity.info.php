@@ -70,8 +70,14 @@ if ($file) {
 	
 	$query = $client->count(['index' => $index]);
 	$docsCount_add=1*$query['count'];
-	//clean_objects($index,'must_not',$ids);
-	//echo "Cleaning success \r\n";
+	
+	if (((count($ids))/$docsCount_start)*100 > 70) {
+		clean_objects($index,'must_not',$ids);
+		echo "Cleaning success \r\n";
+	} else {
+		echo "Cleaning cancelled \r\n";
+	};
+	
 	replace_index_alias($index,"roadsituation_ufacity");
 	$query = $client->count(['index' => $index]);
 	$docsCount_clean=1*$query['count'];
