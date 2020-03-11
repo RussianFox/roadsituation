@@ -510,42 +510,40 @@ function remove_object($index,$id,$aid) {
 function set_stats($id,$obj_count,$generate_time) {
     global $client;
 
-    $date = new DateTime("now", new DateTimeZone("UTC"));
-    $index="roadsituation_stats_quadrs";
+    $index="stats_quadrs_roadsituation";
+	
+    //$response = $client->indices()->create(['index' => $index]);
 	
     $params = [
     	'index' => $index,
     	'id'    => $id,
     	'body'  => [
-			'script' => [
-				'source' => 'ctx._source.generate_time_all += params.generate_time, ctx._source.create_count += params.count, ctx._source.obj_count_all += params.obj_count, ',
-				'params' => [
-					'generate_time' => $generate_time,
-					'obj_count' => $obj_count,
-					'count' => 1,
-				],
-			],
-    		'doc' => [
-				'obj_count' => $obj_count,
-    		    'generate_time' => $generate_time,
-				'create_date' => time()
-    		],
+		'script' => [
+		    'source' => 'ctx._source.generate_time_all += params.generate_time; ctx._source.generate_time = params.generate_time; ctx._source.create_count += params.count; ctx._source.obj_count = params.obj_count; ctx._source.obj_count_all += params.obj_count; ctx._source.create_date = params.timenow;',
+		    'params' => [
+			'generate_time' => $generate_time,
+			'obj_count' => $obj_count,
+			'count' => 1,
+			'timenow' => time()
+		    ],
+		],
     		'upsert' => [
-				'obj_count' => $obj_count,
-				'obj_count_all' => $obj_count,
+		    'obj_count' => $obj_count,
+		    'obj_count_all' => $obj_count,
     		    'generate_time' => $generate_time,
-				'generate_time_all' => $generate_time,
-				'create_count' => 1,
-				'create_date' => time()
+		    'generate_time_all' => $generate_time,
+		    'create_count' => 1,
+		    'create_date' => time()
     		]
         ]
     ];
 
     try {
         $result = $client->update($params);
-		return true;
+	return true;
     } catch (Exception $e)  {
-		return false;
+	var_dump($e);
+	return false;
     }
 }
 
@@ -659,7 +657,7 @@ function get_quadr($quadr) {
     $quadrdata['items']=array_merge($items,yandex_quadr($coords));
 	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
-	set_stats(1*$quadr,$$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time']);
+    set_stats(1*$quadr,$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time']);
     return $quadrdata;
 }
 
