@@ -359,7 +359,7 @@
 		map.addEventListener('mousemove', function(ev) {
             lat = ev.latlng.lat;
             lng = ev.latlng.lng;
-            $('#debugQuadrNumber').innerHTML = getQuadrNumber(lat,lng)
+            $( "#debugQuadrNumber" )[0].innerHTML = getQuadrNumber(lat,lng)
         });
 		L.DomEvent
 		    .addListener(container, 'click', L.DomEvent.stopPropagation)
