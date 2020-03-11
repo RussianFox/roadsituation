@@ -39,6 +39,14 @@ Accept-Encoding: gzip, deflate, br
     ),
 ));
 
+$azs_services = array(
+	'visa'=>'оплата картами',
+	'hotel'=>'гостиница',
+	'tire'=>'шиномонтаж',
+	'wash'=>'автомойка',
+	'cafe'=>'кафе',
+	'shop'=>'магазин'
+);
 
 $url = "http://www.rosneft-azs.ru/map_search";
 
@@ -52,6 +60,15 @@ if ($file) {
     	    $lng=1*trim($station['lng']);
     	    $type='azs';
     	    $name = $station['name']." ".$station['address']." ".$station['contacts']." ".$station['email'];
+			
+			$name = $name." <br>Услуги:  ";
+			foreach($station["services"] as $srv => $en) {
+				if ($en) {
+					$name = $name." ".$azs_services[$srv].", ";
+				};
+			};
+			$name = substr($name,0,-2);
+			
     	    $link = "http://www.rosneft-azs.ru";
 	    update_object_int($id,$lng,$lat,$type,$name,null,$link,$index);
 	    $ids[]=$id;

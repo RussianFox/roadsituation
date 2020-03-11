@@ -48,7 +48,6 @@ $file=false;
 $file=@file_get_contents($url,FALSE,$context);
 if ($file) {
 	$file = json_decode ( $file, TRUE, 15 );
-	var_dump($file['GasStations']);
 	foreach ($file['GasStations'] as $station) {
 	    $id = $station['GasStationId'];
 	    $lat=1*trim($station['Latitude']);
