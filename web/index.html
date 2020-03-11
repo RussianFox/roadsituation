@@ -356,6 +356,11 @@
 	  onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'debug_control');
 		container.innerHTML='<div id=debugConsole></div>'
+		map.addEventListener('mousemove', function(ev) {
+            lat = ev.latlng.lat;
+            lng = ev.latlng.lng;
+            
+        });
 		L.DomEvent
 		    .addListener(container, 'click', L.DomEvent.stopPropagation)
             .addListener(container, 'click', L.DomEvent.preventDefault)
@@ -822,10 +827,10 @@
 		bounds._southWest.lat;
 		bounds._southWest.lon;
 		
-		xmax=360
-		xmin=0
-		ymax=85
-		ymin=-85
+		xmax=180
+		xmin=-180
+		ymax=90
+		ymin=-90
 		xstep=1/10
 		ystep=1/10
 		

@@ -1,9 +1,9 @@
 <?php
 
-$ymin=-85;
-$ymax=85;
-$xmin=0;
-$xmax=360;
+$ymin=-90;
+$ymax=90;
+$xmin=-180;
+$xmax=180;
 $xstep=0.1;
 $ystep=0.1;
 
