@@ -18,10 +18,16 @@ echo "Start ".date('Y-m-d H:i:s')."\r\n";
 $pages=['a','s','o'];
 
 $index="transportmos";
-
+$index_alias="roadsituation_transportmos"; //FALSE if no need
+$bool=$client->indices()->exists(['index' => $index]);
+if (!$bool) {
+	echo "Index is not exist, creating it \r\n";
+    $response = $client->indices()->create(['index' => $index]);
+}
+$query = $client->count(['index' => $index]);
+$docsCount_start=1*$query['count'];
 $ids = array();
 
-//$datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
 $datar = array('action' => 'get_road_closures_coordinates', 'dt' => date('H:i d.m.Y'));
 
 $context = stream_context_create(array(
@@ -94,10 +100,22 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 			$ids[] = $object_id;
 		}
 		
-		echo "Objects loading succes. Start cleaning. \r\n";
-		//clean_objects($index,'must_not',$ids);
-		echo "Cleaning finished \r\n";
-		replace_index_alias($index,"roadsituation_transportmos");
+		echo "Loading objects success \r\n";
+		
+		$query = $client->count(['index' => $index]);
+		$docsCount_add=1*$query['count'];
+		
+		if (((count($ids))/$docsCount_start)*100 > 70) {
+			clean_objects($index,'must_not',$ids);
+			echo "Cleaning success \r\n";
+		} else {
+			echo "Cleaning cancelled \r\n";
+		};
+		
+		if ($index_alias) { replace_index_alias($index,$index_alias); };
+		$query = $client->count(['index' => $index]);
+		$docsCount_clean=1*$query['count'];
+		echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
     } else {
 		echo "failed \r\n";
     }

@@ -11,6 +11,7 @@ function numberFormat($digit, $width) {
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
 $index="ufacity";
+$index_alias="roadsituation_ufacity"; //FALSE if no need
 $bool=$client->indices()->exists(['index' => $index]);
 if (!$bool) {
 	echo "Index is not exist, creating it \r\n";
@@ -78,7 +79,7 @@ if ($file) {
 		echo "Cleaning cancelled \r\n";
 	};
 	
-	replace_index_alias($index,"roadsituation_ufacity");
+	if ($index_alias) { replace_index_alias($index,$index_alias); };
 	$query = $client->count(['index' => $index]);
 	$docsCount_clean=1*$query['count'];
 	echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
