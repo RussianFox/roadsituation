@@ -827,12 +827,15 @@
         nymax = ymax-ymin
         nxmax = xmax-xmin
         
-        lat = lat-nymax*Math.floor((lat-ymin)/nymax,-1)
-        lng = lng-nxmax*Math.floor((lng-xmin)/nxmax,-1)
+        nlat = lat-ymin
+        nlng = lng-xmin
         
-        qx = Math.floor((lng - xmin)/xstep,-1)
-        qy = Math.floor((lat - ymin)/ystep,-1)
-        quadr = qx+(qy*((ymax-ymin)/ystep))
+        nlng = nlng-(Math.floor(nlng/nxmax,-1)*nxmax)
+        if (nlng<0) {
+         nlng = nlng+nxmax
+        }
+        
+        quadr = Math.floor(nlng/xstep,-1)+(Math.floor(nlat/ystep,-1)*(nxmax/xstep))
         
         return quadr
         
