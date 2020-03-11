@@ -659,7 +659,7 @@ function get_quadr($quadr) {
     $quadrdata['items']=array_merge($items,yandex_quadr($coords));
 	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
-	set_stats(1*$quadr,$$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time'])
+	set_stats(1*$quadr,$$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time']);
     return $quadrdata;
 }
 
