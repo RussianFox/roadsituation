@@ -507,6 +507,48 @@ function remove_object($index,$id,$aid) {
     }
 }
 
+function set_stats($id,$obj_count,$generate_time) {
+    global $client;
+
+    $date = new DateTime("now", new DateTimeZone("UTC"));
+    $index="roadsituation_stats_quadrs";
+	
+    $params = [
+    	'index' => $index,
+    	'id'    => $id,
+    	'body'  => [
+			'script' => [
+				'source' => 'ctx._source.generate_time_all += params.generate_time, ctx._source.create_count += params.count, ctx._source.obj_count_all += params.obj_count, ',
+				'params' => [
+					'generate_time' => $generate_time,
+					'obj_count' => $obj_count,
+					'count' => 1,
+				],
+			],
+    		'doc' => [
+				'obj_count' => $obj_count,
+    		    'generate_time' => $generate_time,
+				'create_date' => time()
+    		],
+    		'upsert' => [
+				'obj_count' => $obj_count,
+				'obj_count_all' => $obj_count,
+    		    'generate_time' => $generate_time,
+				'generate_time_all' => $generate_time,
+				'create_count' => 1,
+				'create_date' => time()
+    		]
+        ]
+    ];
+
+    try {
+        $result = $client->update($params);
+		return true;
+    } catch (Exception $e)  {
+		return false;
+    }
+}
+
 function update_object_int($id,$lng, $lat, $type="other", $text="", $addition="", $source, $indexname,$geometry=null) {
     global $client;
 
@@ -617,6 +659,7 @@ function get_quadr($quadr) {
     $quadrdata['items']=array_merge($items,yandex_quadr($coords));
 	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
+	set_stats(1*$quadr,$$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time'])
     return $quadrdata;
 }
 
