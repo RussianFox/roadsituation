@@ -51,7 +51,7 @@ for ($ii=1;$ii<96;$ii++) {
 		for ($i=0; $i<count($matches[1]); $i++) {
 			$id = $matches[1][$i];
 			$link="https://гибдд.рф/milestones/".$matches[1][$i]."/";
-			$name=trim(str_replace('&quot;', '"', $matches[2][$i]));
+			$name="Регион ".$ii.". ".trim(str_replace('&quot;', '"', $matches[2][$i]));
 			$lat=1*trim($matches[3][$i]);
 			$lng=1*trim($matches[4][$i]);
 			if (!update_object_int($id,$lng,$lat,"cam",$name,null,$link,$index)) {
