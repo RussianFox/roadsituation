@@ -100,21 +100,19 @@ Accept-Language: en-US,en;q=0.9,ru;q=0.8
 			$ids[] = $object_id;
 		}
 		
-		echo "Loading objects success \r\n";
-		
 		$query = $client->count(['index' => $index]);
 		$docsCount_add=1*$query['count'];
-		
+		$docsCount_clean=$docsCount_add;
 		if (((count($ids))/$docsCount_start)*100 > 70) {
 			clean_objects($index,'must_not',$ids);
 			echo "Cleaning success \r\n";
+			$query = $client->count(['index' => $index]);
+			$docsCount_clean=1*$query['count'];
 		} else {
 			echo "Cleaning cancelled \r\n";
 		};
 		
 		if ($index_alias) { replace_index_alias($index,$index_alias); };
-		$query = $client->count(['index' => $index]);
-		$docsCount_clean=1*$query['count'];
 		echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
     } else {
 		echo "failed \r\n";
