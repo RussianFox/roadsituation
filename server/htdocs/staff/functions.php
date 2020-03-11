@@ -197,7 +197,7 @@ function convert_coords($x1,$y1,$x2,$y2) {
     return $arr;
 }
 
-coord_quadr($qu) {
+function coord_quadr($qu) {
     $y1 = $GLOBALS['ystep']*floor($qu/($GLOBALS['xmax']-$GLOBALS['xmin']));
     $y2 = $GLOBALS['ystep']+$y1;
     $x1 = ($qu-(floor($qu/($GLOBALS['xmax']-$GLOBALS['xmin']))*(($GLOBALS['ymax']-$GLOBALS['ymin'])/$GLOBALS['ystep'])))*$GLOBALS['xstep'];
