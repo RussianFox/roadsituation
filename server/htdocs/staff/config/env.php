@@ -1,7 +1,7 @@
 <?php
 
-$ymin=-90;
-$ymax=90;
+$ymin=-85;
+$ymax=85;
 $xmin=-180;
 $xmax=180;
 $xstep=0.1;
