@@ -5,6 +5,14 @@ include "../staff/functions.php";
 echo "Start ".date('Y-m-d H:i:s')."\r\n";
 
 $index="speedcamonline";
+$index_alias="roadsituation_speedcamonline"; //FALSE if no need
+$bool=$client->indices()->exists(['index' => $index]);
+if (!$bool) {
+	echo "Index is not exist, creating it \r\n";
+    $response = $client->indices()->create(['index' => $index]);
+}
+$query = $client->count(['index' => $index]);
+$docsCount_start=1*$query['count'];
 
 // Create a stream
 $opts = [
@@ -62,21 +70,32 @@ foreach ($files as $file) {
 				$ids[]=$fullid;
 			}
 		};
-		echo "Objects: $ii\r\n";
     } else {
 		echo " loading failed\r\n";
 		$needclean=false;
     }
 };
 
-if ($needclean) {
-    echo "Start cleaning\r\n";
-    clean_objects($index,'must_not',$ids);
+echo "Loading objects success \r\n";
+
+$query = $client->count(['index' => $index]);
+$docsCount_add=1*$query['count'];
+$docsCount_clean=$docsCount_add;
+if ($need_clean) {
+	if (((count($ids))/$docsCount_start)*100 > 70) {
+		clean_objects($index,'must_not',$ids);
+		echo "Cleaning success \r\n";
+		$query = $client->count(['index' => $index]);
+		$docsCount_clean=1*$query['count'];
+	} else {
+		echo "Cleaning cancelled \r\n";
+	};
 } else {
-	echo "Cleaning canceled\r\n";
+	echo "Cleaning canceled, we have broken regions \r\n";
 };
 
-replace_index_alias($index,"roadsituation_speedcamonline");
+if ($index_alias) { replace_index_alias($index,$index_alias); };
+echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
 
 echo "Finish ".date('Y-m-d H:i:s')."\r\n";
 echo "----------------------------------------\r\n";
