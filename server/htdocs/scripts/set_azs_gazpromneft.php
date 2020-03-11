@@ -9,7 +9,15 @@ function numberFormat($digit, $width) {
 };
 
 $index="azs_gazpromneft";
-
+$index_alias="roadsituation_$index"; //FALSE if no need
+$params = ['index' => $index];
+$bool=$client->indices()->exists(['index' => $index]);
+if (!$bool) {
+	echo "Index is not exist, creating it \r\n";
+    $response = $client->indices()->create(['index' => $index]);
+}
+$query = $client->count(['index' => $index]);
+$docsCount_start=1*$query['count'];
 $ids = array();
 
 //$datar = array('action' => 'get_road_closures_coordinates', 'dt' => $date->format('H:i d.m.Y'));
@@ -26,18 +34,14 @@ Sec-Fetch-Mode: cors
         ),
     ));
 
-    $url = "https://www.gpnbonus.ru/our_azs/?region_id=all";
-    echo "Start loading: $url ..... \r\n";
-    $matches=false;
-    $file=false;
-    $file=@file_get_contents($url,null,$context);
-    if ($file) {
+$url = "https://www.gpnbonus.ru/our_azs/?region_id=all";
+echo "Start loading: $url ..... \r\n";
+$matches=false;
+$file=false;
+$file=@file_get_contents($url,null,$context);
+if ($file) {
 	echo "loaded \r\n";
 	$list = preg_match_all('/id="azs_number_(\d*)">([^<]*)<.*id="azs_address_\d*">([^<]*)<.*serviceText">([^<]*)<.*NewCenterMapC\((.*),(.*),/sUi',$file,$matches);
-	
-//	var_dump($matches);
-//	echo count($matches);
-//	return;
 	
 	foreach ($matches[0] as $key => $value) {
 	
@@ -51,13 +55,27 @@ Sec-Fetch-Mode: cors
 	    $link="https://www.gpnbonus.ru/our_azs/";
 	    update_object_int($object_id,$lng,$lat,$type,$name,null,$link,$index);
 	    $ids[] = $object_id;
-	}
+	};
+	echo "Loading objects success \r\n";
 	
-	clean_objects($index,'must_not',$ids);
-	replace_index_alias($index,"roadsituation_$index");
-    } else {
+	$query = $client->count(['index' => $index]);
+	$docsCount_add=1*$query['count'];
+	$docsCount_clean=$docsCount_add;
+	if (((count($ids))/$docsCount_start)*100 > 70) {
+		clean_objects($index,'must_not',$ids);
+		echo "Cleaning success \r\n";
+		$query = $client->count(['index' => $index]);
+		$docsCount_clean=1*$query['count'];
+	} else {
+		echo "Cleaning cancelled \r\n";
+	};
+	
+	if ($index_alias) { replace_index_alias($index,$index_alias); };
+	echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
+} else {
 	echo "failed \r\n";
-    }
+};
+
 echo "Finish ".date('Y-m-d H:i:s')."\r\n";
 echo "----------------------------------------\r\n";
 ?>
