@@ -197,7 +197,16 @@ function convert_coords($x1,$y1,$x2,$y2) {
     return $arr;
 }
 
-function coord_quadr($qu) {
+coord_quadr($qu) {
+    $y1 = $GLOBALS['ystep']*floor($qu/($GLOBALS['xmax']-$GLOBALS['xmin']));
+    $y2 = $GLOBALS['ystep']+$y1;
+    $x1 = ($qu-(floor($qu/($GLOBALS['xmax']-$GLOBALS['xmin']))*(($GLOBALS['ymax']-$GLOBALS['ymin'])/$GLOBALS['ystep'])))*$GLOBALS['xstep'];
+    $x2 = $GLOBALS['xstep']+$x1;
+    $arr=['x1' => $x1, 'x2' => $x2, 'y1' => $y1, 'y2' => $y2];
+    return $arr;
+}
+
+function coord_quadr_old($qu) {
     $xc=$GLOBALS['xmax']-$GLOBALS['xmin'];
     $xq=$xc/$GLOBALS['xstep'];
     $tv=floor(($qu-1)/$xq);
