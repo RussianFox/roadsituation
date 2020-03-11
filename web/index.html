@@ -355,11 +355,11 @@
 	  },
 	  onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'debug_control');
-		container.innerHTML='<div id=debugConsole></div>'
+		container.innerHTML='<div id=debugConsole></div><div id=debugQuadrNumber></div>'
 		map.addEventListener('mousemove', function(ev) {
             lat = ev.latlng.lat;
             lng = ev.latlng.lng;
-            
+            $('#debugQuadrNumber').innerHTML = getQuadrNumber(lat,lng)
         });
 		L.DomEvent
 		    .addListener(container, 'click', L.DomEvent.stopPropagation)
@@ -813,6 +813,29 @@
 				}
 			}
 		}
+	}
+	
+	function getQuadrNumber(lat,lng) {
+        
+		xmax=180
+		xmin=-180
+		ymax=90
+		ymin=-90
+		xstep=1/10
+		ystep=1/10
+        
+        nymax = ymax-ymin
+        nxmax = xmax-xmin
+        
+        lat = lat-nymax*Math.floor((lat-ymin)/nymax,-1)
+        lng = lng-nxmax*Math.floor((lng-xmin)/nxmax,-1)
+        
+        qx = Math.floor((lng - xmin)/xstep,-1)
+        qy = Math.floor((lat - ymin)/ystep,-1)
+        quadr = qx+(qy*((ymax-ymin)/ystep))
+        
+        return quadr
+        
 	}
 	
 	function changeQuadrs(e) {
