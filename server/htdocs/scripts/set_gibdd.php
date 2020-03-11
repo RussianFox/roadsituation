@@ -86,8 +86,6 @@ if ($need_clean) {
 
 if ($index_alias) { replace_index_alias($index,$index_alias); };
 echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
-
-echo "Statistics. Docs added: ".($docsCount_add-$docsCount_start)." Docs cleaned: ".($docsCount_add-$docsCount_clean)." Docs now: ".$docsCount_clean."\r\n";
 echo "Finish ".date('Y-m-d H:i:s')."\r\n";
 echo "----------------------------------------\r\n";
 ?>

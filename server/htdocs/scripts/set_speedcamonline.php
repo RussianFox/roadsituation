@@ -41,7 +41,7 @@ $files[] = "EU";
 $files[] = "Armenia";
 
 $ids=false;
-$needclean=true;
+$need_clean=true;
 
 foreach ($files as $file) {
     $ii=0;
@@ -72,7 +72,7 @@ foreach ($files as $file) {
 		};
     } else {
 		echo " loading failed\r\n";
-		$needclean=false;
+		$need_clean=false;
     }
 };
 
