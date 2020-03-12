@@ -876,7 +876,7 @@
 	    
 	    y = xt*ystep + ymin
 	    x = (quadr-(xt*(nxmax/xstep)))*xstep + xmin
-	    return {lat1:y, lng1:x, lat2:y+ystep, lng2:x+xstep};
+	    return {minlat:y, minlng:x, maxlat:y+ystep, maxlng:x+xstep};
 	}
 	
 	function changeQuadrs(e) {
