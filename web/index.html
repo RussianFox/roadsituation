@@ -383,7 +383,8 @@
 				quadrMouse = quadr
 				poly.addTo( debugLayerGroup );
 				var marker = new L.marker( L.latLng( qcoord.maxlat, qcoord.minlng ), { opacity: 0.0001 });
-				marker.bindLabel( quadr );
+				//marker.bindLabel( quadr );
+				marker.bindTooltip(quadr, {permanent: true, className: "my-label", offset: [0, 0] });
 				marker.addTo( debugLayerGroup );
 			}
         });
