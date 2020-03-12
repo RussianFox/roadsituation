@@ -378,7 +378,7 @@
 				L.latLng( qcoord.minlat, qcoord.maxlng )
 			);
 			if (quadrMouse !== quadr) {
-				var poly = L.rectangle( bounds, rectStyle ).bindTooltip(quadr, {permanent: true});
+				var poly = L.rectangle( bounds, rectStyle ).bindTooltip(''+quadr, {permanent: true, direction:'center'});
 				debugLayerGroup.clearLayers();
 				quadrMouse = quadr
 				poly.addTo( debugLayerGroup );
