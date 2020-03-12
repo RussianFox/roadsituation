@@ -356,7 +356,6 @@
 	  onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'debug_control');
 		container.innerHTML='<div id=debugConsole></div><div id=debugQuadrNumber></div>'
-		var debugLayer = 
 		var debugLayerGroup = L.layerGroup();
 		map.addLayer( debugLayerGroup );
 		map.addEventListener('mousemove', function(ev) {
