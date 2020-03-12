@@ -356,12 +356,22 @@
 	  onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'debug_control');
 		container.innerHTML='<div id=debugConsole></div><div id=debugQuadrNumber></div>'
-		var polygon = L.polygon(a, {color: 'red'});
+		var debugLayer = 
+		var debugLayerGroup = L.layerGroup();
+		map.addLayer( debugLayerGroup );
 		map.addEventListener('mousemove', function(ev) {
             lat = ev.latlng.lat;
             lng = ev.latlng.lng;
-            $( "#debugQuadrNumber" )[0].innerHTML = ''+getQuadrNumber(lat,lng)+' ('+lat+', '+lng+')'
-			
+			quadr = getQuadrNumber(lat,lng)
+            $( "#debugQuadrNumber" )[0].innerHTML = ''+quadr+' ('+lat+', '+lng+')'
+			qcoord = getQuadrCoords(quadr)
+			var bounds = L.latLngBounds(
+				L.latLng( qcoord.maxlat, qcoord.minlng ),
+				L.latLng( qcoord.minlat, qcoord.maxlng )
+			);
+			var poly = L.rectangle( bounds, rectStyle );
+			debugLayerGroup.clearLayers();
+			poly.addTo( debugLayerGroup );
         });
 		L.DomEvent
 		    .addListener(container, 'click', L.DomEvent.stopPropagation)
@@ -369,36 +379,6 @@
 		return container;
 	  }
 	});
-
-	var debug_tiles = new L.GridLayer();
-	debug_tiles.createTile = function(coords) {
-		var tile = L.DomUtil.create('canvas', 'leaflet-tile');
-		var ctx = tile.getContext('2d');
-		var size = this.getTileSize()
-		tile.width = size.x
-		tile.height = size.y
-
-		// calculate projection coordinates of top left tile pixel
-		var nwPoint = coords.scaleBy(size)
-
-		// calculate geographic coordinates of top left tile pixel
-		var nw = map.unproject(nwPoint, coords.z)
-
-		ctx.fillStyle = 'white';
-		ctx.fillRect(0, 0, size.x, 50);
-		ctx.fillStyle = 'black';
-		ctx.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
-		ctx.fillText('lat: ' + nw.lat + ', lon: ' + nw.lng, 20, 40);
-		ctx.strokeStyle = 'red';
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(size.x-1, 0);
-		ctx.lineTo(size.x-1, size.y-1);
-		ctx.lineTo(0, size.y-1);
-		ctx.closePath();
-		ctx.stroke();
-		return tile;
-	}
 
 	popupContent = $('#tabs')[0].innerHTML
 	var popup = L.popup({ maxWidth: 325, closeOnClick: false, autoClose: false, closeButton: false}).setContent('<div id=popup_tabs style="">'+popupContent+'</div>');
