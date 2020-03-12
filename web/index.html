@@ -904,18 +904,18 @@
 		
 		xc = xmax-xmin
 		xq = xc/xstep
-		qx1 = Math.floor(bounds._southWest.lng/xstep,-1)+1
-		qx2 = Math.floor(bounds._northEast.lng/xstep,-1)+1
-		qy1 = Math.floor((bounds._southWest.lat-ymin)/ystep,-1)+1
-		qy2 = Math.floor((bounds._northEast.lat-ymin)/ystep,-1)+1
+		qx1 = Math.floor((bounds._southWest.lng-xmin)/xstep,-1)
+		qx2 = Math.floor((bounds._northEast.lng-xmin)/xstep,-1)
+		qy1 = Math.floor((bounds._southWest.lat-ymin)/ystep,-1)
+		qy2 = Math.floor((bounds._northEast.lat-ymin)/ystep,-1)
 		
 		quadrCount = (qy2-qy1+1)*(qx2-qx1+1)
 		updateProgress();
 		
 		var rsNewLayers = [];
-		for (var qyn=qy1 ; qyn <= qy2; qyn++) {
-			for (var qxn=qx1; qxn <= qx2; qxn++) {
-				quadr=((qyn-1)*xq)+qxn
+		for (var qyn=qy1-1 ; qyn < qy2; qyn++) {
+			for (var qxn=qx1-1; qxn < qx2; qxn++) {
+				quadr=(qyn*qx)+qxn
 				rsNewLayers.push(quadr)
 			}
 		}
