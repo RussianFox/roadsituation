@@ -636,16 +636,13 @@ function get_quadr($quadr) {
         $params['index'] = 'roadsituation*';
 		$params['size'] = 100;
 		$params['from'] = $iloaded;
-        $params['body']['query']['bool']['must']['geo_bounding_box']['location'] =
+        $params['body']['query']['bool']['must']['geo_shape']['geometry'] =
 		[
-		    'top_left'=>[
-				'lat'=>$coords['y2'],
-				'lon'=>$coords['x1']
+		    'shape'=>[
+				'type'=>'envelope',
+				'coordinates'=>[[$coords['x1'],$coords['y1']],[$coords['x2'],$coords['y2']]]
 		    ],
-		    'bottom_right'=>[
-				'lat'=>$coords['y1'],
-				'lon'=>$coords['x2']
-		    ]
+		    'relation'=>"within"
 		];
 		
         $params['body']['query']['bool']['must_not']['term'] =
