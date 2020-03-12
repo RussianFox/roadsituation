@@ -349,6 +349,15 @@
 
 	mymap.addControl(new helpControl());
 
+	var rectStyle = {
+	  color: "#ff0000",
+	  weight: 1,
+	  opacity: 0.3,
+	  fillOpacity: 0,
+	  lineCap: 'butt'
+	};
+	var debugLayerGroup = L.layerGroup();
+		
 	var debugControl = L.Control.extend({
 	  options: {
 		position: 'bottomleft' 
@@ -356,7 +365,6 @@
 	  onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'debug_control');
 		container.innerHTML='<div id=debugConsole></div><div id=debugQuadrNumber></div>'
-		var debugLayerGroup = L.layerGroup();
 		map.addLayer( debugLayerGroup );
 		map.addEventListener('mousemove', function(ev) {
             lat = ev.latlng.lat;
