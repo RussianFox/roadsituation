@@ -640,7 +640,7 @@ function get_quadr($quadr) {
 		[
 		    'shape'=>[
 				'type'=>'envelope',
-				'coordinates'=>[[$coords['x1'],$coords['y1']],[$coords['x2'],$coords['y2']]]
+				'coordinates'=>[[$coords['x1'],$coords['y2']],[$coords['x2'],$coords['y1']]]
 		    ],
 		    'relation'=>"within"
 		];
