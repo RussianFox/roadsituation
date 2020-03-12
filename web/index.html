@@ -357,6 +357,7 @@
 	  lineCap: 'butt'
 	};
 	var debugLayerGroup = L.layerGroup();
+	var quadrMouse = false
 		
 	var debugControl = L.Control.extend({
 	  options: {
@@ -376,9 +377,12 @@
 				L.latLng( qcoord.maxlat, qcoord.minlng ),
 				L.latLng( qcoord.minlat, qcoord.maxlng )
 			);
-			var poly = L.rectangle( bounds, rectStyle );
-			debugLayerGroup.clearLayers();
-			poly.addTo( debugLayerGroup );
+			if (quadrMouse !== quadr) {
+				var poly = L.rectangle( bounds, rectStyle );
+				debugLayerGroup.clearLayers();
+				quadrMouse = quadr
+				poly.addTo( debugLayerGroup );
+			}
         });
 		L.DomEvent
 		    .addListener(container, 'click', L.DomEvent.stopPropagation)
