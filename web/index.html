@@ -359,7 +359,7 @@
 		map.addEventListener('mousemove', function(ev) {
             lat = ev.latlng.lat;
             lng = ev.latlng.lng;
-            $( "#debugQuadrNumber" )[0].innerHTML = ''+getQuadrNumber(lat,lng)+' ('+lat+', '+lng+') '+ getQuadrCoords(getQuadrNumber(lat,lng))
+            $( "#debugQuadrNumber" )[0].innerHTML = ''+getQuadrNumber(lat,lng)+' ('+lat+', '+lng+') '+ getQuadrCoords(getQuadrNumber(lat,lng))['lng1']
         });
 		L.DomEvent
 		    .addListener(container, 'click', L.DomEvent.stopPropagation)
@@ -842,27 +842,22 @@
 	}
 	
 	function getQuadrCoords(quadr) {
-        
-		xmax=180
-		xmin=-180
-		ymax=85
-		ymin=-85
-		xstep=1/10
-		ystep=1/10
-        
-        nymax = ymax-ymin
-        nxmax = xmax-xmin
-        
-        nlat = lat-ymin
-        nlng = lng-xmin
-        
-		xt = Math.floor(quadr/(nxmax/xstep),-1)
-		
-		y = (ystep*(xt)) - ymin
-        x = (quadr-(xt*(nxmax/xstep)))*xstep - xmin
-		
-        return {lat:x, lng:y};
-        
+
+	    xmax=180
+	    xmin=-180
+	    ymax=85
+	    ymin=-85
+	    xstep=0.1
+	    ystep=0.1
+
+	    nymax = ymax-ymin
+	    nxmax = xmax-xmin
+
+	    xt = Math.floor(quadr/(nxmax/xstep),-1)
+	    
+	    y = xt*ystep + ymin
+	    x = (quadr-(xt*(nxmax/xstep)))*xstep + xmin
+	    return {lat1:y, lng1:x, lat2:y+ystep, lng2:x+xstep};
 	}
 	
 	function changeQuadrs(e) {
