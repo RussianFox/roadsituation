@@ -107,12 +107,16 @@ function point_in_coords($point,$coords) {
 
 function parse_yandex($yfile) {
 	
-	var $arr = array();
+	$arr = array();
 	
 	$file = json_decode($yfile,TRUE,15);
 	if (array_key_exists('error',$file)) {
 		return false;
-	}
+	};
+	
+	$selsh = array('addition'=>null,'confirm'=>0,'discard'=>0,'geometry'=>null,'source'=>'maps.yandex.ru','time'=>'','type'=>'accident','location'=>array('lat'=>0,'lon'=>0));
+	$elsh = array('_index'=>'yandex','_score'=>1,'_type'=>'_doc','_source'=>$selsh);
+	
 	foreach ($file['data']['features'] as $feature) {
 		if ($feature['properties']['eventType']==1) {
 			$lat=$feature['geometry']['coordinates'][0];
@@ -179,11 +183,11 @@ function yandex_quadr_turbo($coords) {
 
     for ($XX=$yandexBox['xmin']; $XX<=$yandexBox['xmax']; $XX++) {
 		for ($YY=$yandexBox['ymin']; $YY<=$yandexBox['ymax']; $YY++) {
-		{
 			$url = "https://core-jams-rdr.maps.yandex.net/1.1/tiles?trf&l=trje&lang=ru&x=$XX&y=$YY&z=$ZZ&scale=1&tm=$tm&format=json";
 			$curl_arr[] = curl_init($url);
 			curl_setopt(end($curl_arr), CURLOPT_RETURNTRANSFER, true);
-			curl_multi_add_handle($master, end($curl_arr[$i]));
+			curl_setopt(end($curl_arr), CURLOPT_USERAGENT, "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36");
+			curl_multi_add_handle($master, end($curl_arr));
 		}
 	}
 		
@@ -192,13 +196,15 @@ function yandex_quadr_turbo($coords) {
 	} while($running > 0);
 
 
-	for($i = 0; $i < $node_count; $i++)
 	foreach($curl_arr as $cnode)
 	{
-		$results[] = curl_multi_getcontent  ( $cnode );
+		$results = curl_multi_getcontent  ( $cnode );
+		if ($results) {
+		    //var_dump($results);
+		}
 		$narr = parse_yandex($results);
 		if ($narr) {
-			$arr = array_merge($arr, $narr); 
+			$arr = array_merge($arr, $narr);
 		};
 	}
 	return $arr;
@@ -762,7 +768,7 @@ function get_quadr($quadr) {
     $quadrdata['quadr']['date']=time();
     $quadrdata['hits']['elastic']=$result['hits']['total']['value'];
 	$items = clean_aid($items);
-    $quadrdata['items']=array_merge($items,yandex_quadr($coords));
+    $quadrdata['items']=array_merge($items,yandex_quadr_turbo($coords));
 	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
     set_stats(1*$quadr,$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time']);
