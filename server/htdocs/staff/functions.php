@@ -105,6 +105,107 @@ function point_in_coords($point,$coords) {
 
 }
 
+function parse_yandex($yfile) {
+	
+	var $arr = array();
+	
+	$file = json_decode($yfile,TRUE,15);
+	if (array_key_exists('error',$file)) {
+		return false;
+	}
+	foreach ($file['data']['features'] as $feature) {
+		if ($feature['properties']['eventType']==1) {
+			$lat=$feature['geometry']['coordinates'][0];
+			$lon=$feature['geometry']['coordinates'][1];
+			
+			//if (!point_in_coords(array('lat'=>$lat,'lon'=>$lon),$coords)) {
+			//	continue;
+			//};
+			
+			$id=$feature['properties']['HotspotMetaData']['id'];
+			$name="";
+			
+			//get name
+			$urld="https://core-jams-rdr.maps.yandex.net/description?id=".$id."&l=trje&lang=ru_RU&tm=$tm";
+			$context = yandex_context();
+			$filed=@file($urld,FALSE,$context);
+			$filed = json_decode($filed[0],TRUE,15);
+			if ($filed) {
+				$name = $filed['description']." ".$filed['startTime'];
+			};
+			
+			//echo "DTP in point $lat,$lng $name \r\n";
+			
+			$el = $elsh;
+			$el['_id']=$id;
+			$el['_source']['location']['lat']=$lat;
+			$el['_source']['location']['lon']=$lon;
+			$el['_source']['text']=$name;
+			$el['_source']['time']=time();
+			$el['_source']['layer']=$url;
+			//var_dump($el);
+			$arr[]=$el;
+		}
+	}
+	return $arr;
+}
+
+function yandex_context() {
+    $context = stream_context_create(array(
+		'http' => array
+			(
+				'method' => 'GET',
+				'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+			),
+    ));
+	return $context;
+}
+
+function yandex_quadr_turbo($coords) {
+    $arr=array();
+
+    $selsh = array('addition'=>null,'confirm'=>0,'discard'=>0,'geometry'=>null,'source'=>'maps.yandex.ru','time'=>'','type'=>'accident','location'=>array('lat'=>0,'lon'=>0));
+    $elsh = array('_index'=>'yandex','_score'=>1,'_type'=>'_doc','_source'=>$selsh);
+
+    $tm=time();
+    $ZZ=13;
+
+    $yandexBox = yandexTile($coords['x1'],$coords['y1'],$coords['x2'],$coords['y2'],$ZZ);
+
+    $context = yandex_context();
+
+	$curl_arr = array();
+	$master = curl_multi_init();
+
+    for ($XX=$yandexBox['xmin']; $XX<=$yandexBox['xmax']; $XX++) {
+		for ($YY=$yandexBox['ymin']; $YY<=$yandexBox['ymax']; $YY++) {
+		{
+			$url = "https://core-jams-rdr.maps.yandex.net/1.1/tiles?trf&l=trje&lang=ru&x=$XX&y=$YY&z=$ZZ&scale=1&tm=$tm&format=json";
+			$curl_arr[] = curl_init($url);
+			curl_setopt(end($curl_arr), CURLOPT_RETURNTRANSFER, true);
+			curl_multi_add_handle($master, end($curl_arr[$i]));
+		}
+	}
+		
+	do {
+		curl_multi_exec($master,$running);
+	} while($running > 0);
+
+
+	for($i = 0; $i < $node_count; $i++)
+	foreach($curl_arr as $cnode)
+	{
+		$results[] = curl_multi_getcontent  ( $cnode );
+		$narr = parse_yandex($results);
+		if ($narr) {
+			$arr = array_merge($arr, $narr); 
+		};
+	}
+	return $arr;
+	
+	
+}
+
 function yandex_quadr($coords) {
     $arr=array();
 
