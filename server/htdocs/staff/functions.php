@@ -105,7 +105,7 @@ function point_in_coords($point,$coords) {
 
 }
 
-function parse_yandex($yfile) {
+function parse_yandex($yfile,$coords) {
 	
 	$arr = array();
 	
@@ -202,7 +202,7 @@ function yandex_quadr_turbo($coords) {
 		if ($results) {
 		    //var_dump($results);
 		}
-		$narr = parse_yandex($results);
+		$narr = parse_yandex($results,$coords);
 		if ($narr) {
 			$arr = array_merge($arr, $narr);
 		};
