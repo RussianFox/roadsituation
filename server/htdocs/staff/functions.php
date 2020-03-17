@@ -122,9 +122,9 @@ function parse_yandex($yfile) {
 			$lat=$feature['geometry']['coordinates'][0];
 			$lon=$feature['geometry']['coordinates'][1];
 			
-			//if (!point_in_coords(array('lat'=>$lat,'lon'=>$lon),$coords)) {
-			//	continue;
-			//};
+			if (!point_in_coords(array('lat'=>$lat,'lon'=>$lon),$coords)) {
+				continue;
+			};
 			
 			$id=$feature['properties']['HotspotMetaData']['id'];
 			$name="";
