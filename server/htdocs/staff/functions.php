@@ -766,9 +766,12 @@ function get_quadr($quadr) {
     $quadrdata=[];
     $quadrdata['quadr']['id']=1*$quadr;
     $quadrdata['quadr']['date']=time();
+    $quadrdata['quadr']['human_date']=date('D M j G:i:s T Y',$quadrdata['quadr']['date']);
     $quadrdata['hits']['elastic']=$result['hits']['total']['value'];
 	$items = clean_aid($items);
-    $quadrdata['items']=array_merge($items,yandex_quadr_turbo($coords));
+    $yandex_items = yandex_quadr_turbo($coords);
+    $quadrdata['hits']['yandex']=count($yandex_items);
+    $quadrdata['items']=array_merge($items,$yandex_items);
 	$quadrdata['hits']['total']=count($quadrdata['items']);
     $quadrdata['quadr']['generate_time']=microtime(true)-$start;
     set_stats(1*$quadr,$quadrdata['hits']['total'],$quadrdata['quadr']['generate_time']);
