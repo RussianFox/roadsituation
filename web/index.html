@@ -701,6 +701,23 @@
 		
 	}
 	
+	function copyItemProperties(item) {
+        var properties = {
+                            index: item._index,
+                            id: item._id,
+                            aid: item._source.aid,
+                            type: item._source.type,
+                            source: item._source.source,
+                            text: item._source.text,
+                            link: item._source.source,
+                            time:item._source.time,
+                            addition: item._source.addition,
+                            confirm_count:item._source.confirm,
+                            discard_count:item._source.discard
+                    }
+        return properties
+	}
+	
 	function loadQuadr(quadr) {
 		if (rsLoads>20) {
 			return false;
@@ -731,13 +748,13 @@
 					//addition = parseTypesObj(item._source.type)+' '+parseAdditions(item._source.addition)
 					//popupText="<img style='max-width: 25px;' src='src/img/medium/"+item._source.type+".png'> "+ParseData(item._source.time)+" <br />"+addition +" <p><b>"+item._source.text+"</b></p> <div lat='"+item._source.location.lat+"' lng='"+item._source.location.lon+"' class='josm_edit' onclick='josmedit(this)'></div> <div style='text-align:right'>"+link+"</div>"
 					if (typeof(rsMarkers[quadr][item._index+item._id]) == 'undefined') {
-						//newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup(popupText).on('popupopen', objectPopup)
+						//тут надо создать маркер
 						newMarker = L.marker([item._source.location.lat, item._source.location.lon],{icon: rsIcons[item._source.type]}).bindPopup('').on('popupopen', objectPopup)
-						newMarker.feature = {properties: {index: item._index, id: item._id, type: item._source.type, aid: item._source.aid, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.discard}}
+						newMarker.feature = {properties: copyItemProperties(item)}
 						rsMarkers[quadr][item._index+item._id] = newMarker
 					} else {
 						//тут надо обновить маркер
-						rsMarkers[quadr][item._index+item._id].feature = {properties: {index: item._index, id: item._id, type: item._source.type, source: item._source.source, text: item._source.text, link: item._source.source, time:item._source.time, addition: item._source.addition, confirm_count:item._source.confirm, discard_count:item._source.discard}}
+						rsMarkers[quadr][item._index+item._id].feature = {properties: copyItemProperties(item)}
 						rsMarkers[quadr][item._index+item._id].setLatLng(new L.LatLng(item._source.location.lat, item._source.location.lon));
 					}
 					rsNewMarkers.push(''+item._index+item._id)
