@@ -18,45 +18,24 @@ $query = $client->count(['index' => $index]);
 $docsCount_start=1*$query['count'];
 $ids = array();
 
-$datar = array('rubric_id' => '3');
-
-$context = stream_context_create(array(
-        'http' => array(
-            'method' => 'POST',
-            'header' => "
-Pragma: no-cache
-Cache-Control: no-cache
-Accept: application/json, text/javascript, */*; q=0.01
-X-Requested-With: XMLHttpRequest
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36
-Sec-Fetch-Mode: cors
-Content-Type: application/x-www-form-urlencoded; charset=UTF-8
-Sec-Fetch-Site: same-origin
-Referer: https://transport.mos.ru/info/closures/?type=&district=&address=&dt=&id=
-Accept-Encoding: gzip, deflate, br
-Accept-Language: en-US,en;q=0.9,ru;q=0.8
-            ",
-            'content' => http_build_query($datar),
-        ),
-    ));
-
-	$url = "https://xn--80acgfbsl1azdqr.xn--p1ai/data-send/infomap/items";
+	$url = "https://xn--80acgfbsl1azdqr.xn--p1ai/data-send/infomap/items?rubric_id=3";
     echo "Start loading: $url \r\n";
     $matches=false;
 	$rc=10;
 	$file=false;
 	while (($rc>0) and (!$file)) {
 		echo "Trying...\r\n";
-		$file=@file_get_contents($url,null,$context);
+		$file=@file_get_contents($url);
 		$rc--;
 	}
     if ($file) {
 		echo "loaded \r\n";
-		foreach ($file['data']['items'] as $feature) {
+		$file = json_decode($file, true);
+		foreach ($file['items'] as $feature) {
 		
 			$object_id=$feature['id'];
 			$type="block";
-			$name=$feature['title'].'<br>'.$feature['comment'];
+			$name=$feature['data']['title'].'<br>'.$feature['comment'];
 			$link="https://екатеринбург.рф/жителям/инфокарта#".$object_id;
 			
 			$coordinates=array();
