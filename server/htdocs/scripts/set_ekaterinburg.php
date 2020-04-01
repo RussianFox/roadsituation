@@ -31,18 +31,18 @@ $ids = array();
     if ($file) {
 		echo "loaded \r\n";
 		$file = json_decode($file, true);
-		foreach ($file['items'] as $feature) {
+		foreach ($file['data']['items'] as $feature) {
 		
 			$object_id=$feature['id'];
 			$type="block";
-			$name=$feature['data']['title'].'<br>'.$feature['comment'];
+			$name=$feature['title'].'<br>'.$feature['comment'].'<br>'.$feature['date_start'].' - '.$feature['date_end'];
 			$link="https://екатеринбург.рф/жителям/инфокарта#".$object_id;
 			
 			$coordinates=array();
 			
 			foreach ($feature['points'] as $point) {
-			
-                array_push($coordinates,array('lat'=>$point[1],"lng"=>$point[0]));
+                $point = explode(",",$point);
+                array_push($coordinates,array('lat'=>1*trim($point[1]),"lng"=>1*trim($point[0])));
 			
 			}
 			$center = center_line($coordinates);
@@ -54,7 +54,7 @@ $ids = array();
 		$query = $client->count(['index' => $index]);
 		$docsCount_add=1*$query['count'];
 		$docsCount_clean=$docsCount_add;
-		if (((count($ids))/$docsCount_start)*100 > 70) {
+		if (((count($ids))/max(1,$docsCount_start))*100 > 70) {
 			clean_objects($index,'must_not',$ids);
 			echo "Cleaning success \r\n";
 			$query = $client->count(['index' => $index]);
